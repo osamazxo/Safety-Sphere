@@ -1,6 +1,6 @@
 const Reading = require("../models/readings");
 const Device = require("../models/devices");
-
+const User = require("../models/users");
 const addReading = async (req, res) => {
   const { device, secret, ...others } = req.query;
 
@@ -14,4 +14,12 @@ const addReading = async (req, res) => {
   res.send(newReading);
 };
 
+const getReadings = async (req, res) => {
+  const currentUser = await User.findById(req.userId);
+  const readings = await Reading.find({
+    device: currentUser.device,
+  });
+  res.send(readings);
+};
 exports.addReading = addReading;
+exports.getReadings = getReadings;

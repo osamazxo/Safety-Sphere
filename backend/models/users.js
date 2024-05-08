@@ -14,6 +14,11 @@ const userSchema = new Schema({
     required: true,
     ref: "devices",
   },
+  role: {
+    type: String,
+    required: true,
+    default: "user",
+  },
 });
 
 module.exports = model("users", userSchema);
