@@ -15,7 +15,7 @@ export function useSignin() {
       toast.success("Welcome Back!");
       navigate("/");
     },
-    onError: (res: { message: string }) => {
+    onError: (res: Error) => {
       toast.error(res.message || "There was an error");
     },
   });
