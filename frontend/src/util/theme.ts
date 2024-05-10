@@ -2,18 +2,20 @@ import { createTheme } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Theme {
-    status: {
-      danger: string;
+    common: {
+      border: string;
     };
   }
   // allow configuration using `createTheme`
   interface ThemeOptions {
-    status?: {
-      danger?: string;
-    };
+    common?: { border?: string };
   }
 }
+
 const theme = createTheme({
+  common: {
+    border: "#191b1f",
+  },
   palette: {
     mode: "dark",
     background: {
@@ -24,7 +26,6 @@ const theme = createTheme({
       main: "#41b06e",
       light: "#29b562",
       dark: "#29b562",
-      border: "#191b1f",
     },
     text: {
       primary: "#fefeff",

@@ -77,7 +77,8 @@ const SigninForm = () => {
           width: "400px",
           alignItems: "center",
           gap: "16px",
-          border: "1px solid #191b1f",
+          border: "1px solid",
+          borderColor: (theme) => theme.common.border,
         }}
       >
         <img
