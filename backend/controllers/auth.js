@@ -36,7 +36,7 @@ const signin = async (req, res) => {
       token,
     });
   } catch (err) {
-    res.send({
+    res.status(400).send({
       message: err.message,
     });
   }

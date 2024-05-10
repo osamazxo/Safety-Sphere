@@ -1,10 +1,18 @@
+import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
 function Layout() {
   return (
-    <div>
+    <Box
+      className="f-column"
+      sx={{
+        minHeight: "100vh",
+        width: "100%",
+        px: "16px",
+      }}
+    >
       <Outlet />
-    </div>
+    </Box>
   );
 }
 
