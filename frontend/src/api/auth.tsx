@@ -13,7 +13,7 @@ export function useSignin() {
     onSuccess: (res: { token: string }) => {
       localStorage.setItem("token", res.token);
       toast.success("Welcome Back!");
-      navigate("/");
+      navigate("/user");
     },
     onError: (res: Error) => {
       toast.error(res.message || "There was an error");

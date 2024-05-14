@@ -7,6 +7,7 @@ import Signout from "@pages/Signout";
 import Settings from "@pages/Settings";
 import Analytics from "@pages/User/Analytics";
 
+// eslint-disable-next-line react-refresh/only-export-components
 const ProtectedRoute = () => {
   const navigate = useNavigate();
   useEffect(() => {
