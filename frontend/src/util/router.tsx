@@ -4,7 +4,7 @@ import Signin from "@pages/Signin";
 import { useEffect } from "react";
 import { Outlet, createBrowserRouter, useNavigate } from "react-router-dom";
 import Signout from "@pages/Signout";
-import Settings from "@pages/Settings";
+import UserSettings from "@pages/User/Settings";
 import Analytics from "@pages/User/Analytics";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -64,7 +64,7 @@ const router = createBrowserRouter([
           },
           {
             path: "settings",
-            element: <Settings />,
+            element: <UserSettings />,
           },
         ],
       },
