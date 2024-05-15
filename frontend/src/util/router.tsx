@@ -18,11 +18,29 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
+const Fallback = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("role") === "admin") {
+      return navigate("/admin");
+    } else {
+      return navigate("/user");
+    }
+  }, [navigate]);
+  return <Outlet />;
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <ProtectedRoute />,
     children: [
+      //global routes
+      {
+        index: true,
+        element: <Fallback />,
+      },
       {
         path: "/signin",
         element: <Signin />,
@@ -31,6 +49,7 @@ const router = createBrowserRouter([
         path: "/signout",
         element: <Signout />,
       },
+      // user routes
       {
         path: "/user",
         element: <UserLayout />,
@@ -49,6 +68,7 @@ const router = createBrowserRouter([
           },
         ],
       },
+      // admin routes
     ],
   },
 ]);

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Signin = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    if (localStorage.getItem("token")) navigate("/user");
+    if (localStorage.getItem("token")) navigate("/");
   }, [navigate]);
   return (
     <>

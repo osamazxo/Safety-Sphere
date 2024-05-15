@@ -10,12 +10,10 @@ export type DrawerItem = {
 
 const Item: FC<{
   active: boolean;
-  setActiveItem: (itemTitle: string) => void;
   item: DrawerItem;
-}> = ({ active, item, setActiveItem }) => {
+}> = ({ active, item }) => {
   return (
     <Box
-      onClick={() => setActiveItem(item.title)}
       component={Link}
       to={item.url}
       sx={{

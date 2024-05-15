@@ -64,7 +64,7 @@ const SigninForm = () => {
   });
 
   return (
-    <BoxWithBorder>
+    <BoxWithBorder width="100%" maxWidth="360px">
       <Box
         className="f-column"
         component="form"
@@ -73,8 +73,7 @@ const SigninForm = () => {
           backgroundColor: "background.paper",
           padding: "48px 16px",
           borderRadius: "8px",
-          minWidth: "300px",
-          width: "400px",
+          width: "100%",
           alignItems: "center",
           gap: "16px",
           border: "1px solid",

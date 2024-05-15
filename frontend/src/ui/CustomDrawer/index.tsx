@@ -1,11 +1,14 @@
 import { Box, Typography } from "@mui/material";
-import { FC, useState } from "react";
+import { FC } from "react";
 import Item, { DrawerItem } from "./Item";
+import useGetParams from "@hooks/useGetParams";
 
 const CustomDrawer: FC<{
   items: DrawerItem[];
 }> = ({ items }) => {
-  const [activeItem, setActiveItem] = useState<string | null>(null);
+  const params = useGetParams();
+  let activeItem = params[0].toLowerCase();
+  if (activeItem === "user") activeItem = "home";
   return (
     <Box
       sx={{
@@ -39,8 +42,7 @@ const CustomDrawer: FC<{
           <Item
             key={item.title}
             item={item}
-            active={item.title === activeItem}
-            setActiveItem={setActiveItem}
+            active={item.title.toLowerCase() === activeItem}
           />
         ))}
       </Box>

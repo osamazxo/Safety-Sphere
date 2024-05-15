@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -13,10 +13,14 @@ export function useSignin() {
     onSuccess: (res: { token: string }) => {
       localStorage.setItem("token", res.token);
       toast.success("Welcome Back!");
-      navigate("/user");
+      navigate("/");
     },
-    onError: (res: Error) => {
-      toast.error(res.message || "There was an error");
+    onError: (
+      res: AxiosError<{
+        message: string;
+      }>
+    ) => {
+      toast.error(res?.response?.data.message || "There was an error");
     },
   });
   return mutation;
