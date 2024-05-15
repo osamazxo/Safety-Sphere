@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { FC } from "react";
 import Item, { DrawerItem } from "./Item";
 import useGetParams from "@hooks/useGetParams";
+import Header from "./Header";
 
 const CustomDrawer: FC<{
   items: DrawerItem[];
@@ -11,32 +12,22 @@ const CustomDrawer: FC<{
   if (activeItem === "user") activeItem = "home";
   return (
     <Box
+      className="main-drawer"
       sx={{
-        width: { xs: "350px" },
+        width: { xs: "100%", sm: "350px" },
         minHeight: "100vh",
         backgroundColor: "background.paper",
         p: "16px",
-        display: "flex",
+        display: { xs: "none", sm: "flex" },
+        position: { xs: "fixed", sm: "relative" },
         flexDirection: "column",
+        "&.open": {
+          display: "flex",
+          zIndex: "1000",
+        },
       }}
     >
-      <Box
-        display="flex"
-        gap="16px"
-        alignItems="center"
-        mb="16px"
-        pb="24px"
-        pt="8px"
-        sx={{
-          borderBottom: "1px solid",
-          borderColor: (theme) => theme.palette.divider,
-        }}
-      >
-        <img src="/logo.png" alt="website logo" style={{ width: "36px" }} />
-        <Typography variant="h5" fontWeight="600">
-          Safety Sphere
-        </Typography>
-      </Box>
+      <Header />
       <Box display="flex" flexDirection="column" gap="8px">
         {items.map((item) => (
           <Item
