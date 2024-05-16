@@ -19,6 +19,7 @@ const Signin = () => {
         sx={{
           minHeight: "100vh",
           width: "100%",
+          px: "16px",
         }}
       >
         <SigninForm />

@@ -60,7 +60,7 @@ const Preferences = () => {
       >
         <CheckInput
           id="gasNotify"
-          label="Email me when there is gas leak."
+          label="Email me when there is a gas leak."
           formik={formik}
         />
         <CheckInput
