@@ -42,6 +42,13 @@ const theme = createTheme({
             padding: "8px 14px ",
             fontSize: "14px",
           },
+          "& input:-webkit-autofill": {
+            boxShadow: "0 0 0 100px #171a1e inset",
+            borderRadius: "0",
+          },
+          "&:has(> input:-webkit-autofill)": {
+            backgroundColor: "#171a1e",
+          },
         },
       },
     },

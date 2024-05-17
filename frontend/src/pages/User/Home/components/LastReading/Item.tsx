@@ -18,8 +18,7 @@ const Item: FC<{
         sx={{
           background: (theme) => theme.palette.background.paper,
           borderRadius: "16px",
-          border: "1px solid",
-          borderColor: (theme) => theme.common.border,
+
           padding: "16px",
         }}
       >

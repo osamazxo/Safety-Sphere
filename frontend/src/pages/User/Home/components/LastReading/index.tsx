@@ -1,4 +1,3 @@
-import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import Item from "./Item";
 import {
   DeviceThermostatOutlined,
@@ -7,7 +6,7 @@ import {
 
 const LastReading = () => {
   return (
-    <Grid2 container my="16px" spacing="16px">
+    <>
       <Item
         item={{
           title: "Temperature",
@@ -42,7 +41,7 @@ const LastReading = () => {
           date: new Date().toISOString(),
         }}
       />
-    </Grid2>
+    </>
   );
 };
 
