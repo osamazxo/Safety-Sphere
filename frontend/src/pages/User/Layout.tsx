@@ -2,7 +2,7 @@ import { Analytics, Home, Logout, Settings } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import CustomDrawer from "@ui/CustomDrawer";
 import { Outlet } from "react-router-dom";
-import WelcomeCard from "./Home/components/WelcomeCard";
+import Header from "@ui/Header";
 
 const drawerItems = [
   {
@@ -38,10 +38,10 @@ function Layout() {
           width: "100%",
           maxWidth: "2048px",
           mx: "auto",
-          p: "16px",
+          px: "16px",
         }}
       >
-        <WelcomeCard />
+        <Header />
         <Outlet />
       </Box>
     </Box>

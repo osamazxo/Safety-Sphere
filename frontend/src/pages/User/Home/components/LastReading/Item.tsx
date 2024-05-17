@@ -13,7 +13,7 @@ const Item: FC<{
   item: ReadingItem;
 }> = ({ item }) => {
   return (
-    <Grid2 xs={12} sm={6} md={3}>
+    <Grid2 xs={12} md={6} lg={3}>
       <Box
         sx={{
           background: (theme) => theme.palette.background.paper,

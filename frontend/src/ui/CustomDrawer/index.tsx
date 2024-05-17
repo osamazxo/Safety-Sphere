@@ -17,7 +17,6 @@ const CustomDrawer: FC<{
         width: { xs: "100%", sm: "350px" },
         minHeight: "100vh",
         backgroundColor: "background.paper",
-        p: "16px",
         display: { xs: "none", sm: "flex" },
         position: { xs: "fixed", sm: "relative" },
         flexDirection: "column",
@@ -28,7 +27,7 @@ const CustomDrawer: FC<{
       }}
     >
       <Header />
-      <Box display="flex" flexDirection="column" gap="8px">
+      <Box display="flex" flexDirection="column" gap="8px" px="16px">
         {items.map((item) => (
           <Item
             key={item.title}

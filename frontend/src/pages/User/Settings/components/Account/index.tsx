@@ -81,7 +81,7 @@ const Account = () => {
         border: "1px solid",
         borderColor: (theme) => theme.common.border,
         backgroundColor: "background.paper",
-        my: "16px",
+        mb: "16px",
         p: "16px",
         maxWidth: "600px",
       }}
