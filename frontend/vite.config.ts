@@ -4,6 +4,9 @@ import svgr from "vite-plugin-svgr";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  optimizeDeps: {
+    include: ["@emotion/react", "@emotion/styled", "@mui/material/Tooltip"],
+  },
   plugins: [react(), svgr(), tsConfigPaths()],
   resolve: {
     alias: [{ find: "@", replacement: "/src/" }],

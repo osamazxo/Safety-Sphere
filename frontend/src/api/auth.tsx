@@ -10,8 +10,9 @@ export function useSignin() {
       const res = await axios.post("auth/signin", data);
       return res.data;
     },
-    onSuccess: (res: { token: string }) => {
+    onSuccess: (res: { token: string; role: string }) => {
       localStorage.setItem("token", res.token);
+      localStorage.setItem("role", res.role);
       toast.success("Welcome Back!");
       navigate("/");
     },
