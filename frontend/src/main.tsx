@@ -12,7 +12,7 @@ import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
 const queryClient = new QueryClient({});
 
-axios.defaults.baseURL = "https://safety-sphere-api.vercel.app";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.headers.common["token"] = localStorage.getItem("token");
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
