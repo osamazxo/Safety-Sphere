@@ -10,6 +10,10 @@ const tokenSchema = new Schema(
       type: Types.ObjectId,
       required: true,
     },
+    role: {
+      type: String,
+      required: true,
+    },
     valid: {
       type: Boolean,
       required: true,

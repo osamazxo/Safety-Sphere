@@ -11,7 +11,6 @@ const userSchema = new Schema({
   },
   device: {
     type: Types.ObjectId,
-    required: true,
     ref: "devices",
   },
   role: {
