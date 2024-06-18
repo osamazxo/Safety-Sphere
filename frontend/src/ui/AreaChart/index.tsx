@@ -83,7 +83,6 @@ const AreaChart: FC<{
         backgroundColor: "background.paper",
         borderRadius: "16px",
         p: "16px 8px 0px",
-        my: "16px",
       }}
     >
       <Typography variant="h6" px="8px">
