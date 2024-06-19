@@ -36,7 +36,7 @@ function Layout() {
         sx={{
           minHeight: "100vh",
           width: "100%",
-          maxWidth: "2048px",
+          maxWidth: "1440px",
           mx: "auto",
           px: "16px",
         }}
