@@ -6,7 +6,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { Box, SvgIconProps, TextField, Typography } from "@mui/material";
 import { FormikProps, useFormik } from "formik";
-import { JSXElementConstructor } from "react";
+import { FC, JSXElementConstructor } from "react";
 
 const CustomTextField = ({
   id,
@@ -34,6 +34,7 @@ const CustomTextField = ({
       type={type}
       placeholder={placeholder}
       InputProps={{
+        autoComplete: "new-password",
         startAdornment: (
           <Icon
             fontSize="small"
@@ -61,7 +62,7 @@ const CustomTextField = ({
   );
 };
 
-const Account = () => {
+const Account: FC<{ maxWidth?: string }> = ({ maxWidth = "600px" }) => {
   const formik = useFormik({
     initialValues: {
       userName: "",
@@ -83,7 +84,7 @@ const Account = () => {
         backgroundColor: "background.paper",
         mb: "16px",
         p: "16px",
-        maxWidth: "600px",
+        maxWidth,
       }}
     >
       <Box>

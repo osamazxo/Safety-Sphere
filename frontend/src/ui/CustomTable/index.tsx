@@ -27,7 +27,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 }
 
 type Order = "asc" | "desc";
-
+type Row = { [x: string]: string | number | React.ReactNode };
 function getComparator<Key extends keyof never>(
   order: Order,
   orderBy: Key
@@ -127,12 +127,16 @@ export default function CustomTable({
   headCells,
   rows,
   title,
-  rowsPerPage = 5,
+  rowsPerPage = 10,
+  showHeader = true,
+  startSlot,
 }: {
   headCells: HeadCell[];
-  rows: { [x: string]: string | number }[];
+  rows: Row[];
   title: string;
   rowsPerPage?: number;
+  showHeader?: boolean;
+  startSlot?: React.ReactNode;
 }) {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<string>("calories");
@@ -155,10 +159,10 @@ export default function CustomTable({
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
+      stableSort(
+        rows as { [x: string]: string | number }[],
+        getComparator(order, orderBy)
+      ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [order, orderBy, page, rowsPerPage, rows]
   );
 
@@ -167,7 +171,8 @@ export default function CustomTable({
       sx={{ width: "100%", mb: 2, borderRadius: "16px", overflow: "hidden" }}
       elevation={0}
     >
-      <EnhancedTableToolbar title={title} />
+      {startSlot}
+      {showHeader && <EnhancedTableToolbar title={title} />}
       <TableContainer>
         <Table
           sx={{
@@ -176,7 +181,7 @@ export default function CustomTable({
               borderColor: (theme) => theme.common.border,
             },
           }}
-          aria-labelledby="tableTitle"
+          aria-labelledby={title}
           size={"medium"}
         >
           <EnhancedTableHead
@@ -197,7 +202,12 @@ export default function CustomTable({
                     index === 0 ? (
                       ""
                     ) : (
-                      <TableCell align="left">{row[headCell.id]}</TableCell>
+                      <TableCell
+                        align="left"
+                        key={index + "" + row[headCell.id]}
+                      >
+                        {row[headCell.id]}
+                      </TableCell>
                     )
                   )}
                 </TableRow>

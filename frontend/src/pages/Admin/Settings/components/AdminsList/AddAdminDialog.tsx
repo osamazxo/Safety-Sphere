@@ -1,4 +1,3 @@
-import { Autorenew } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
@@ -6,43 +5,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   TextField,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { FC, MouseEventHandler } from "react";
+import { FC } from "react";
 import * as Yup from "yup";
-function generatePass() {
-  let pass = "";
-  const str =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz0123456789@#$";
 
-  for (let i = 1; i <= 8; i++) {
-    const char = Math.floor(Math.random() * str.length + 1);
-    pass += str.charAt(char);
-  }
-
-  return pass;
-}
-const AutoFill: FC<{
-  onClick: MouseEventHandler<HTMLButtonElement>;
-}> = ({ onClick }) => {
-  return (
-    <IconButton
-      onClick={onClick}
-      sx={{
-        position: "absolute",
-        right: "4px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        p: "4px",
-      }}
-    >
-      <Autorenew fontSize="small" />
-    </IconButton>
-  );
-};
-const AddDeviceDialog: FC<{
+const AddAdminDialog: FC<{
   open: boolean;
   setOpen: (val: boolean) => void;
 }> = ({ open, setOpen }) => {
@@ -52,7 +21,7 @@ const AddDeviceDialog: FC<{
       password: "",
     },
     validationSchema: Yup.object().shape({
-      userName: Yup.string().required().min(6),
+      userName: Yup.string().required().min(4),
       password: Yup.string().required().min(8),
     }),
     enableReinitialize: true,
@@ -60,14 +29,6 @@ const AddDeviceDialog: FC<{
       console.log(values);
     },
   });
-  const handleGeneratePass = () => {
-    const newPass = generatePass();
-    formik.setFieldValue("password", newPass);
-  };
-  const handleGenerateUsername = () => {
-    const newUsername = (new Date().getTime() + "").slice(5);
-    formik.setFieldValue("userName", newUsername);
-  };
 
   return (
     <Dialog
@@ -78,7 +39,7 @@ const AddDeviceDialog: FC<{
         elevation: 3,
       }}
     >
-      <DialogTitle>Add New Device</DialogTitle>
+      <DialogTitle>Add New Admin</DialogTitle>
       <DialogContent
         sx={{
           display: "flex",
@@ -100,13 +61,13 @@ const AddDeviceDialog: FC<{
               autoComplete: "new-password",
             }}
           />
-          <AutoFill onClick={handleGenerateUsername} />
         </Box>
         <Box position="relative">
           <TextField
             placeholder="Password"
             fullWidth
             id="password"
+            type="password"
             value={formik.values.password}
             error={!!formik.errors.password}
             onChange={formik.handleChange}
@@ -115,7 +76,6 @@ const AddDeviceDialog: FC<{
               autoComplete: "new-password",
             }}
           />
-          <AutoFill onClick={handleGeneratePass} />
         </Box>
       </DialogContent>
       <DialogActions>
@@ -126,4 +86,4 @@ const AddDeviceDialog: FC<{
   );
 };
 
-export default AddDeviceDialog;
+export default AddAdminDialog;

@@ -8,6 +8,7 @@ import UserSettings from "@pages/User/Settings";
 import Analytics from "@pages/User/Analytics";
 import AdminLayout from "@pages/Admin/Layout";
 import AdminHome from "@pages/Admin/Home";
+import AdminSettings from "@pages/Admin/Settings";
 import Devices from "@pages/Admin/Devices";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -86,7 +87,7 @@ const router = createBrowserRouter([
           },
           {
             path: "settings",
-            element: <UserSettings />,
+            element: <AdminSettings />,
           },
         ],
       },
