@@ -1,5 +1,5 @@
-const User = require("../models/users");
-const Token = require("../models/tokens");
+const User = require("../../../models/users");
+const Token = require("../../../models/tokens");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -66,5 +66,32 @@ const addAdmin = async (req, res) => {
     });
   }
 };
+
+const editUser = async (req, res) => {
+  //validate password
+  const { userName, email, preferences, password, cpassword } = req.body;
+  let hashedPass = null;
+  if (password) {
+    if (password !== cpassword)
+      res.status(400).send({ message: "Password doesn't match" });
+    hashedPass = await bcrypt.hash(password, 12);
+  }
+
+  //find and update user
+  const user = await User.findById(req.userId);
+  try {
+    await user.updateOne({
+      userName,
+      email,
+      password: hashedPass,
+      preferences,
+    });
+    res.status(201).send({ message: "updated successfully" });
+  } catch (err) {
+    res.status(400).send({ message: "there was an error" });
+    console.log(err);
+  }
+};
 exports.signin = signin;
 exports.addAdmin = addAdmin;
+exports.editUser = editUser;

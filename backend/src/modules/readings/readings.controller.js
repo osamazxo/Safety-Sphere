@@ -1,6 +1,6 @@
-const Reading = require("../models/readings");
-const Device = require("../models/devices");
-const User = require("../models/users");
+const Reading = require("../../../models/readings");
+const Device = require("../../../models/devices");
+const User = require("../../../models/users");
 const addReading = async (req, res) => {
   const { device, secret } = req.query;
 

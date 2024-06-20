@@ -1,5 +1,5 @@
-const Device = require("../models/devices");
-const User = require("../models/users");
+const Device = require("../../../models/devices");
+const User = require("../../../models/users");
 const bcrypt = require("bcryptjs");
 const addDevice = async (req, res) => {
   const { userName, password } = req.body;

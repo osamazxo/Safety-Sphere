@@ -9,6 +9,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    default: "",
+  },
   device: {
     type: Types.ObjectId,
     ref: "devices",
@@ -17,6 +21,47 @@ const userSchema = new Schema({
     type: String,
     required: true,
     default: "user",
+  },
+  lastSeen: {
+    type: String,
+    required: true,
+    default: new Date().toISOString(),
+  },
+  preferences: {
+    emailGas: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    emailVibration: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    temperatureRange: {
+      min: {
+        type: Number,
+        required: true,
+        default: 20,
+      },
+      max: {
+        type: Number,
+        required: true,
+        default: 50,
+      },
+    },
+    humidityRange: {
+      min: {
+        type: Number,
+        required: true,
+        default: 40,
+      },
+      max: {
+        type: Number,
+        required: true,
+        default: 80,
+      },
+    },
   },
 });
 
