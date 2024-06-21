@@ -46,11 +46,13 @@ const signin = async (req, res) => {
 };
 
 const addAdmin = async (req, res) => {
-  const { userName, password, secret } = req.body;
-  if (secret !== "@!456145236!@")
-    res.status(403).send({
-      message: "You don't have access",
-    });
+  const { userName, password } = req.body;
+
+  // check if another user with the same userName exist
+  const user = await User.findOne({ userName });
+  if (user) res.status(400).send({ message: "Username is already taken" });
+
+  // adding the new admin
   const hashedPassword = await bcrypt.hash(password, 12);
   const newUser = new User({
     userName,
@@ -67,9 +69,19 @@ const addAdmin = async (req, res) => {
   }
 };
 
+const deleteAdmin = async (req, res) => {
+  const { userName } = req.body;
+  try {
+    await User.findOneAndDelete({ userName });
+    res.status(200).send({ message: "User was deleted successfully" });
+  } catch (err) {
+    res.status(400).send({ message: "There was an error deleting this user" });
+  }
+};
+
 const editUser = async (req, res) => {
   //validate password
-  const { userName, email, preferences, password, cpassword } = req.body;
+  const { password, cpassword } = req.body;
   let hashedPass = null;
   if (password) {
     if (password !== cpassword)
@@ -80,18 +92,15 @@ const editUser = async (req, res) => {
   //find and update user
   const user = await User.findById(req.userId);
   try {
-    await user.updateOne({
-      userName,
-      email,
-      password: hashedPass,
-      preferences,
-    });
+    await user.updateOne({ ...req.body, password: hashedPass });
     res.status(201).send({ message: "updated successfully" });
   } catch (err) {
     res.status(400).send({ message: "there was an error" });
     console.log(err);
   }
 };
+
 exports.signin = signin;
 exports.addAdmin = addAdmin;
+exports.deleteAdmin = deleteAdmin;
 exports.editUser = editUser;
