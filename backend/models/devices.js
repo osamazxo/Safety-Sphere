@@ -14,28 +14,17 @@ const deviceSchema = new Schema(
     },
     location: {
       type: String,
+      default: "Unknown",
     },
     lastSeen: {
-      type: String,
+      type: Date,
       default: new Date().toISOString(),
       required: true,
     },
-    temperature: {
-      type: String,
-      required: false,
-    },
-    humidity: {
-      type: String,
-      required: false,
-    },
-    vibration: {
-      type: String,
-      required: false,
-    },
-    gas: {
-      type: String,
-      required: false,
-    },
+    temperature: Number,
+    humidity: Number,
+    vibration: Number,
+    gas: Number,
   },
   { timestamps: true }
 );

@@ -39,6 +39,11 @@ const userSchema = new Schema({
       default: true,
     },
     temperatureRange: {
+      active: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
       min: {
         type: Number,
         required: true,
@@ -51,6 +56,11 @@ const userSchema = new Schema({
       },
     },
     humidityRange: {
+      active: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
       min: {
         type: Number,
         required: true,
