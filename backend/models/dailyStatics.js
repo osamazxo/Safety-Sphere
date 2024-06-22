@@ -1,16 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
 
-const AlertType = {
-  startTime: {
-    type: Date,
-    required: true,
-    default: new Date().toISOString(),
-  },
-  endTime: {
-    type: Date,
-    default: null,
-  },
-};
 const dailyStaticsSchema = new Schema(
   {
     date: {
@@ -60,15 +49,7 @@ const dailyStaticsSchema = new Schema(
         required: true,
         default: 0,
       },
-      alerts: [
-        {
-          ...AlertType,
-          value: {
-            type: Number,
-            required: true,
-          },
-        },
-      ],
+      alerts: [{ type: String, ref: "alerts" }],
     },
     humidity: {
       minimum: {
@@ -91,21 +72,13 @@ const dailyStaticsSchema = new Schema(
         required: true,
         default: 0,
       },
-      alerts: [
-        {
-          ...AlertType,
-          value: {
-            type: Number,
-            required: true,
-          },
-        },
-      ],
+      alerts: [{ type: String, ref: "alerts" }],
     },
     gas: {
-      alerts: [AlertType],
+      alerts: [{ type: String, ref: "alerts" }],
     },
     vibration: {
-      alerts: [AlertType],
+      alerts: [{ type: String, ref: "alerts" }],
     },
   },
   {

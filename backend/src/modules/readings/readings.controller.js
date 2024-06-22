@@ -2,6 +2,7 @@ const Reading = require("../../../models/readings");
 const Device = require("../../../models/devices");
 const User = require("../../../models/users");
 const DailyStatics = require("../../../models/dailyStatics");
+const Alert = require("../../../models/alerts");
 
 const getDeviceObject = async (req, res) => {
   const { device: deviceId, secret } = req.query;
@@ -17,9 +18,7 @@ const addReading = async (req, res) => {
   const deviceUser = await User.findById(currentDevice.user);
   let { temperature, humidity, gas, vibration } = req.body;
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  console.log(ip);
-  const ipLocation = "Egypt";
-
+  let ipLocation = "Egypt";
   // update last reading of curreen device
   await currentDevice.updateOne({
     ...req.body,
@@ -48,20 +47,26 @@ const addReading = async (req, res) => {
     const preferedMinTemp = deviceUser.preferences.temperatureRange.min;
     const preferedMaxTemp = deviceUser.preferences.temperatureRange.max;
     const dailyAlerts = dailyStatics.temperature.alerts;
+    const lastAlert =
+      dailyAlerts.length === 0
+        ? null
+        : await Alert.findById(dailyAlerts[dailyAlerts.length - 1]);
 
     if (temperature < preferedMinTemp || temperature > preferedMaxTemp) {
       //check if there was a past alert ended to add new one
-      if (
-        dailyAlerts.length === 0 ||
-        (dailyAlerts.length > 0 &&
-          dailyAlerts[dailyAlerts.length - 1].endTime !== null)
-      ) {
-        //check if the past alert ended to add new one
-        dailyAlerts.push({
+      if (!lastAlert || lastAlert.endTime !== null) {
+        const newAlert = new Alert({
+          device: currentDevice._id,
+          sensor: "temperature",
           startTime: new Date().toISOString(),
+          reason:
+            temperature < preferedMinTemp
+              ? "Temperature is below the minimum prefered value"
+              : "Temperature is above the maximum prefered value",
           endTime: null,
-          value: temperature,
         });
+        await newAlert.save();
+        dailyAlerts.push(newAlert._id);
         // ........... send alert
         if (deviceUser.preferences.temperatureRange.active) {
           console.log("send alert");
@@ -71,11 +76,9 @@ const addReading = async (req, res) => {
     // if temperature is in range
     else {
       //check if there was a past alert and end it
-      if (
-        dailyAlerts.length > 0 &&
-        dailyAlerts[dailyAlerts.length - 1].endTime === null
-      ) {
-        dailyAlerts[dailyAlerts.length - 1].endTime = new Date().toISOString();
+      if (lastAlert && lastAlert.endTime === null) {
+        lastAlert.endTime = new Date().toISOString();
+        await lastAlert.save();
       }
     }
   }
@@ -92,20 +95,27 @@ const addReading = async (req, res) => {
     const preferedMinTemp = deviceUser.preferences.humidityRange.min;
     const preferedMaxTemp = deviceUser.preferences.humidityRange.max;
     const dailyAlerts = dailyStatics.humidity.alerts;
+    const lastAlert =
+      dailyAlerts.length === 0
+        ? null
+        : await Alert.findById(dailyAlerts[dailyAlerts.length - 1]);
 
     if (humidity < preferedMinTemp || humidity > preferedMaxTemp) {
       //check if there was a past alert ended to add new one
-      if (
-        dailyAlerts.length === 0 ||
-        (dailyAlerts.length > 0 &&
-          dailyAlerts[dailyAlerts.length - 1].endTime !== null)
-      ) {
+      if (!lastAlert || lastAlert.endTime !== null) {
         //check if the past alert ended to add new one
-        dailyAlerts.push({
+        const newAlert = new Alert({
+          device: currentDevice._id,
+          sensor: "humidity",
           startTime: new Date().toISOString(),
+          reason:
+            humidity < preferedMinTemp
+              ? "Humidity is below the minimum prefered value"
+              : "Humidity is above the maximum prefered value",
           endTime: null,
-          value: humidity,
         });
+        await newAlert.save();
+        dailyAlerts.push(newAlert._id);
         // ........... send alert
         if (deviceUser.preferences.humidityRange.active) {
           console.log("send alert");
@@ -115,68 +125,77 @@ const addReading = async (req, res) => {
     // if humidity is in range
     else {
       //check if there was a past alert and end it
-      if (
-        dailyAlerts.length > 0 &&
-        dailyAlerts[dailyAlerts.length - 1].endTime === null
-      ) {
-        dailyAlerts[dailyAlerts.length - 1].endTime = new Date().toISOString();
+      if (lastAlert && lastAlert.endTime === null) {
+        lastAlert.endTime = new Date().toISOString();
+        await lastAlert.save();
       }
     }
   }
 
   if (gas !== undefined) {
     const dailyAlerts = dailyStatics.gas.alerts;
+    const lastAlert =
+      dailyAlerts.length === 0
+        ? null
+        : await Alert.findById(dailyAlerts[dailyAlerts.length - 1]);
+
     // check if there is a gas leak
     if (gas === 1) {
       // check if the last alert was ended to add new one
-      if (
-        dailyAlerts.length === 0 ||
-        dailyAlerts[dailyAlerts.length - 1].endTime !== null
-      ) {
-        dailyAlerts.push({
+      if (!lastAlert || lastAlert.endTime !== null) {
+        const newAlert = new Alert({
+          device: currentDevice._id,
+          sensor: "gas",
           startTime: new Date().toISOString(),
           endTime: null,
+          reason: "There is a gas leak",
         });
+        await newAlert.save();
+        dailyAlerts.push(newAlert._id);
+
         if (deviceUser.preferences.emailGas) {
           //send email
         }
       }
     } else {
       // check if the last alert wasn't ended to end it
-      if (
-        dailyAlerts.length > 0 &&
-        dailyAlerts[dailyAlerts.length - 1].endTime === null
-      ) {
-        dailyAlerts[dailyAlerts.length - 1].endTime = new Date().toISOString();
+      if (dailyAlerts.length > 0 && lastAlert.endTime === null) {
+        lastAlert.endTime = new Date().toISOString();
+        await lastAlert.save();
       }
     }
   }
 
   if (vibration !== undefined) {
     const dailyAlerts = dailyStatics.vibration.alerts;
+    const lastAlert =
+      dailyAlerts.length === 0
+        ? null
+        : await Alert.findById(dailyAlerts[dailyAlerts.length - 1]);
+
     // check if there is a vibration leak
     if (vibration === 1) {
       // check if the last alert was ended to add new one
-      if (
-        dailyAlerts.length === 0 ||
-        (dailyAlerts.length > 0 &&
-          dailyAlerts[dailyAlerts.length - 1].endTime !== null)
-      ) {
-        dailyAlerts.push({
+      if (!lastAlert || lastAlert.endTime !== null) {
+        const newAlert = new Alert({
+          device: currentDevice._id,
+          sensor: "vibration",
           startTime: new Date().toISOString(),
           endTime: null,
+          reason: "There is a vibration",
         });
+        await newAlert.save();
+        dailyAlerts.push(newAlert._id);
+
         if (deviceUser.preferences.emailVibration) {
           //send email
         }
       }
     } else {
       // check if the last alert wasn't ended to end it
-      if (
-        dailyAlerts.length > 0 &&
-        dailyAlerts[dailyAlerts.length - 1].endTime === null
-      ) {
-        dailyAlerts[dailyAlerts.length - 1].endTime = new Date().toISOString();
+      if (dailyAlerts.length > 0 && lastAlert.endTime === null) {
+        lastAlert.endTime = new Date().toISOString();
+        await lastAlert.save();
       }
     }
   }
