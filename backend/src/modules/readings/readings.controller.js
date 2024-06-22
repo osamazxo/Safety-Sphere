@@ -2,7 +2,7 @@ const Reading = require("../../../models/readings");
 const Device = require("../../../models/devices");
 const User = require("../../../models/users");
 const DailyStatics = require("../../../models/dailyStatics");
-const { lookup } = require("geoip-lite");
+
 const getDeviceObject = async (req, res) => {
   const { device: deviceId, secret } = req.query;
   const currentDevice = await Device.findById(deviceId);
@@ -11,12 +11,14 @@ const getDeviceObject = async (req, res) => {
     res.status(403).send({ message: "Incorrect device secret" });
   return currentDevice;
 };
+
 const addReading = async (req, res) => {
   const currentDevice = await getDeviceObject(req, res);
   const deviceUser = await User.findById(currentDevice.user);
   let { temperature, humidity, gas, vibration } = req.body;
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  const ipLocation = lookup(ip);
+  console.log(ip);
+  const ipLocation = "Egypt";
 
   // update last reading of curreen device
   await currentDevice.updateOne({
