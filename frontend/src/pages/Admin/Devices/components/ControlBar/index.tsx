@@ -13,9 +13,10 @@ import AddDeviceDialog from "./AddDeviceDialog";
 const ConstrolBar: FC<{
   sortBy: SortBy;
   setSortBy: (sortBy: SortBy) => void;
-}> = ({ sortBy, setSortBy }) => {
+  searchValue: string;
+  setSearchValue: (val: string) => void;
+}> = ({ sortBy, setSortBy, searchValue, setSearchValue }) => {
   const [dialogOpened, setDialogOpened] = useState<boolean>(false);
-  const [searchValue, setSearchValue] = useState<string>("");
   const handleSorting = (event: SelectChangeEvent) => {
     setSortBy(event.target.value as SortBy);
   };
@@ -23,7 +24,7 @@ const ConstrolBar: FC<{
   return (
     <Box display="flex" alignItems="center" gap="8px" flexWrap="wrap">
       <TextField
-        placeholder="Search Device by id"
+        placeholder="Search Device by Username"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
         sx={{
@@ -47,7 +48,7 @@ const ConstrolBar: FC<{
           flex: 1,
         }}
       >
-        <MenuItem value={"id"}>Sort by id</MenuItem>
+        <MenuItem value={"_id"}>Sort by id</MenuItem>
         <MenuItem value={"location"}>Sort by loction</MenuItem>
         <MenuItem value={"temperature"}>Sort by temperature</MenuItem>
         <MenuItem value={"humidity"}>Sort by humidity</MenuItem>

@@ -1,3 +1,4 @@
+import { useAddDevice } from "@api/devices";
 import { Autorenew } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -46,6 +47,11 @@ const AddDeviceDialog: FC<{
   open: boolean;
   setOpen: (val: boolean) => void;
 }> = ({ open, setOpen }) => {
+  const { mutate: addDevice, isLoading: addingDevice } = useAddDevice(() => {
+    setOpen(false);
+    formik.resetForm();
+  });
+
   const formik = useFormik({
     initialValues: {
       userName: "",
@@ -57,7 +63,7 @@ const AddDeviceDialog: FC<{
     }),
     enableReinitialize: true,
     onSubmit: (values) => {
-      console.log(values);
+      addDevice(values);
     },
   });
   const handleGeneratePass = () => {
@@ -120,7 +126,12 @@ const AddDeviceDialog: FC<{
       </DialogContent>
       <DialogActions>
         <LoadingButton onClick={() => setOpen(false)}>Cancel</LoadingButton>
-        <LoadingButton onClick={() => formik.handleSubmit()}>Add</LoadingButton>
+        <LoadingButton
+          loading={addingDevice}
+          onClick={() => formik.handleSubmit()}
+        >
+          Add
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

@@ -1,6 +1,7 @@
 const Device = require("../../../models/devices");
 const User = require("../../../models/users");
 const bcrypt = require("bcryptjs");
+const { asyncHandler } = require("../../middlewares/asyncHandler");
 
 const getDeviceObject = async (req) => {
   const deviceId = req.params["deviceId"];
@@ -9,91 +10,71 @@ const getDeviceObject = async (req) => {
   return device;
 };
 
-const getDevices = async (req, res) => {
-  const devices = await Device.find();
-  res.status(200).send({
+const getDevices = asyncHandler(async (req, res) => {
+  const devices = await Device.find().populate("user", "userName");
+  return res.status(200).send({
     message: "done",
     devices,
   });
-};
+});
 
-const getDevice = async (req, res) => {
+const getDevice = asyncHandler(async (req, res) => {
   const device = await getDeviceObject(req);
-  res.status(200).send({
+  return res.status(200).send({
     message: "done",
     device,
   });
-};
+});
 
-const addDevice = async (req, res) => {
+const addDevice = asyncHandler(async (req, res) => {
   const { userName, password } = req.body;
-  try {
-    // check if username already exists
-    const user = await User.findOne({
-      userName: userName,
-    });
-    if (user) throw Error("Username already exists");
 
-    // creating new device
-    const newDevice = new Device();
+  // check if username already exists
+  const user = await User.findOne({
+    userName: userName,
+  });
+  if (user) throw new Error("Username already exists");
 
-    // creating new user
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const newUser = new User({
-      device: newDevice._id,
-      userName,
-      password: hashedPassword,
-    });
-    await newUser.save();
+  // creating new device
+  const newDevice = new Device();
 
-    newDevice.user = newUser._id;
-    await newDevice.save();
-    res.send(newDevice);
-  } catch (err) {
-    console.log(err);
-    res.send(err.message);
-  }
-};
+  // creating new user
+  const hashedPassword = await bcrypt.hash(password, 12);
+  const newUser = new User({
+    device: newDevice._id,
+    userName,
+    password: hashedPassword,
+  });
+  await newUser.save();
 
-const editDevice = async (req, res) => {
+  newDevice.user = newUser._id;
+  await newDevice.save();
+  return res.send(await newDevice.populate("user", "userName"));
+});
+
+const editDevice = asyncHandler(async (req, res) => {
   const { password, secret } = req.body;
   const device = await getDeviceObject(req);
   if (password) {
-    try {
-      const hashedPass = await bcrypt.hash(password, 12);
-      const deviceUser = await User.findById(device.user);
-      await deviceUser.updateOne({ password: hashedPass });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "there was an error updating password" });
-    }
+    const hashedPass = await bcrypt.hash(password, 12);
+    const deviceUser = await User.findById(device.user);
+    await deviceUser.updateOne({ password: hashedPass });
   }
   if (secret) {
-    try {
-      await device.updateOne({ secret });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "there was an error updating secret" });
-    }
+    await device.updateOne({ secret });
   }
-  res.status(200).send({
+  return res.status(200).send({
     message: "Device was updated successfully",
   });
-};
+});
 
-const deleteDevice = async (req, res) => {
+const deleteDevice = asyncHandler(async (req, res) => {
   const device = await getDeviceObject(req);
-  try {
-    const deviceUser = await User.findById(device.user);
-    await deviceUser.deleteOne();
-    await device.deleteOne();
-    res.status(200).send({ message: "Device was deleted successfully" });
-  } catch (err) {
-    res.status(400).send({
-      message: "There was an error deleting this device",
-    });
-  }
-};
+  const deviceUser = await User.findById(device.user);
+  await deviceUser.deleteOne();
+  await device.deleteOne();
+  return res.status(200).send({ message: "Device was deleted successfully" });
+});
 
 exports.getDevices = getDevices;
 exports.getDevice = getDevice;

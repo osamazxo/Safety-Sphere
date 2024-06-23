@@ -1,3 +1,4 @@
+import { DeviceType } from "@api/devices";
 import {
   GasMeterOutlined,
   MoreHorizOutlined,
@@ -8,17 +9,8 @@ import {
 } from "@mui/icons-material";
 import { Box, IconButton, SvgIconTypeMap, Typography } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { FC } from "react";
-
-export type DeviceProp = {
-  id: string;
-  location: string;
-  lastSeen: string;
-  temperature: number;
-  humidity: number;
-  vibrition: number;
-  gas: number;
-};
+import { FC, useState } from "react";
+import DeviceMenu from "./DeviceMenu";
 
 const Detial: FC<{
   Icon: OverridableComponent<SvgIconTypeMap<unknown, "svg">>;
@@ -39,8 +31,10 @@ const Detial: FC<{
 };
 
 const DeviceItem: FC<{
-  item: DeviceProp;
+  item: DeviceType;
 }> = ({ item }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   return (
     <Box
       p="16px"
@@ -60,16 +54,25 @@ const DeviceItem: FC<{
         }}
       >
         <Typography variant="body1" fontWeight="600">
-          {item.id}
+          {item?.user?.userName}
         </Typography>
-        <IconButton sx={{ p: "4px" }}>
+        <IconButton
+          sx={{ p: "4px" }}
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+        >
           <MoreHorizOutlined fontSize="small" />
         </IconButton>
       </Box>
       <Box></Box>
       <Box display="flex" flexWrap="wrap" gap="8px" mb="8px">
-        <Detial Icon={Thermostat} value={item.temperature + "°C"} />
-        <Detial Icon={WaterDropOutlined} value={item.humidity + "%"} />
+        <Detial
+          Icon={Thermostat}
+          value={item.temperature ? item.temperature + "°C" : "Unknown"}
+        />
+        <Detial
+          Icon={WaterDropOutlined}
+          value={item.humidity ? item.humidity + "%" : "Unknown"}
+        />
         <Detial
           Icon={GasMeterOutlined}
           value={item.gas === 1 ? "True" : "False"}
@@ -95,6 +98,7 @@ const DeviceItem: FC<{
           minute: "2-digit",
         })}
       </Typography>
+      <DeviceMenu anchorEl={anchorEl} setAnchorEl={setAnchorEl} device={item} />
     </Box>
   );
 };
