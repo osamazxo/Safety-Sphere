@@ -1,3 +1,4 @@
+import { useUpdateAccount } from "@api/auth";
 import {
   EmailOutlined,
   LockOutlined,
@@ -63,6 +64,8 @@ const CustomTextField = ({
 };
 
 const Account: FC<{ maxWidth?: string }> = ({ maxWidth = "600px" }) => {
+  const { mutate: updateAccount, isLoading: updatingAccount } =
+    useUpdateAccount();
   const formik = useFormik({
     initialValues: {
       userName: "",
@@ -72,7 +75,7 @@ const Account: FC<{ maxWidth?: string }> = ({ maxWidth = "600px" }) => {
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      console.log(values);
+      updateAccount(values);
     },
   });
   return (
@@ -133,6 +136,7 @@ const Account: FC<{ maxWidth?: string }> = ({ maxWidth = "600px" }) => {
         <LoadingButton
           variant="outlined"
           type="submit"
+          loading={updatingAccount}
           sx={{
             alignSelf: "flex-end",
             width: "fit-content",
