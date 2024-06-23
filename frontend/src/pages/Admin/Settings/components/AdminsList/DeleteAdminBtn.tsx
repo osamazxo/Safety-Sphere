@@ -3,7 +3,7 @@ import { IconButton } from "@mui/material";
 import { FC, useState } from "react";
 import DeleteAdminDialog from "./DeleteAdminDialog";
 
-const DeleteAdminBtn: FC<{ userId: string }> = ({ userId }) => {
+const DeleteAdminBtn: FC<{ userName: string }> = ({ userName }) => {
   const [dialogOpened, setDialogOpened] = useState<boolean>(false);
 
   return (
@@ -14,7 +14,7 @@ const DeleteAdminBtn: FC<{ userId: string }> = ({ userId }) => {
       <DeleteAdminDialog
         open={dialogOpened}
         setOpen={setDialogOpened}
-        userId={userId}
+        userName={userName}
       />
     </>
   );

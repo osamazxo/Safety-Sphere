@@ -95,7 +95,7 @@ const addAdmin = asyncHandler(async (req, res) => {
 
   // check if another user with the same userName exist
   const user = await User.findOne({ userName });
-  if (user) res.status(400).send({ message: "Username is already taken" });
+  if (user) throw new CustomError("Username is already taken");
 
   // adding the new admin
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -104,14 +104,8 @@ const addAdmin = asyncHandler(async (req, res) => {
     password: hashedPassword,
     role: "admin",
   });
-  try {
-    await newUser.save();
-    res.status(201).send(newUser);
-  } catch (err) {
-    res.status(400).send({
-      message: "There was an error saving the new admin in database",
-    });
-  }
+  await newUser.save();
+  res.status(201).send(newUser);
 });
 
 const deleteAdmin = asyncHandler(async (req, res) => {

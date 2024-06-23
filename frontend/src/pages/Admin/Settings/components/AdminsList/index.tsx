@@ -4,6 +4,7 @@ import CustomTable, { HeadCell } from "@ui/CustomTable";
 import { ReactNode, useState } from "react";
 import DeleteAdminBtn from "./DeleteAdminBtn";
 import AddAdminDialog from "./AddAdminDialog";
+import { useGetAdmins } from "@api/auth";
 
 const headCells: HeadCell[] = [
   {
@@ -47,6 +48,7 @@ const createData = (
 });
 const AdminsList = () => {
   const [addAdminOpened, setAddAdminOpened] = useState<boolean>(false);
+  const { data: adminsList } = useGetAdmins();
   return (
     <Box maxWidth="800px">
       <CustomTable
@@ -70,22 +72,17 @@ const AdminsList = () => {
             </Button>
           </Box>
         }
-        rows={[
-          createData(
-            "1",
-            "osama",
-            "osamazxo@outlook.com",
-            new Date().toISOString(),
-            <DeleteAdminBtn userId="123" />
-          ),
-          createData(
-            "2",
-            "ahmed",
-            "ahmed@outlook.com",
-            new Date().toISOString(),
-            <DeleteAdminBtn userId="234" />
-          ),
-        ]}
+        rows={
+          adminsList?.map((admin) =>
+            createData(
+              admin._id,
+              admin.userName,
+              admin.email || "-",
+              admin.lastSeen,
+              <DeleteAdminBtn userName={admin.userName} />
+            )
+          ) || []
+        }
       />
       <AddAdminDialog open={addAdminOpened} setOpen={setAddAdminOpened} />
     </Box>

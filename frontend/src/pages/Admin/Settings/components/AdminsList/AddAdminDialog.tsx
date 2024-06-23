@@ -1,3 +1,4 @@
+import { useAddAdmin } from "@api/auth";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
@@ -15,6 +16,9 @@ const AddAdminDialog: FC<{
   open: boolean;
   setOpen: (val: boolean) => void;
 }> = ({ open, setOpen }) => {
+  const { mutate: addAdmin, isLoading: addingAdmin } = useAddAdmin(() => {
+    setOpen(false);
+  });
   const formik = useFormik({
     initialValues: {
       userName: "",
@@ -26,7 +30,7 @@ const AddAdminDialog: FC<{
     }),
     enableReinitialize: true,
     onSubmit: (values) => {
-      console.log(values);
+      addAdmin(values);
     },
   });
 
@@ -80,7 +84,12 @@ const AddAdminDialog: FC<{
       </DialogContent>
       <DialogActions>
         <LoadingButton onClick={() => setOpen(false)}>Cancel</LoadingButton>
-        <LoadingButton onClick={() => formik.handleSubmit()}>Add</LoadingButton>
+        <LoadingButton
+          loading={addingAdmin}
+          onClick={() => formik.handleSubmit()}
+        >
+          Add
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

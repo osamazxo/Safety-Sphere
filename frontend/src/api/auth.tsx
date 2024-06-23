@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 
 type AccountType = {
@@ -23,7 +23,12 @@ type AccountType = {
     emailVibration: boolean;
   };
 };
-
+type UserType = {
+  _id: string;
+  userName: string;
+  lastSeen: string;
+  email: string;
+};
 export function useSignin() {
   const navigate = useNavigate();
   const mutation = useMutation({
@@ -79,14 +84,31 @@ export function useUpdateAccount(onSuccess?: () => void, onError?: () => void) {
 }
 
 // admin routes
+export function useGetAdmins() {
+  const query = useQuery<UserType[]>({
+    queryKey: ["admins"],
+    queryFn: async () => {
+      const res = await axios.get("auth/admin");
+      return res.data.admins;
+    },
+  });
+  return query;
+}
+
 export function useAddAdmin(onSuccess?: () => void, onError?: () => void) {
+  const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: { userName: string; password: string }) => {
       const res = await axios.post("auth/admin", data);
-      return res;
+      return res.data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (res, variables) => {
+      console.log(res);
       toast.success(variables.userName + " was added successfully");
+      queryClient.setQueryData<UserType[]>("admins", (old) => {
+        if (old) return [...old, res];
+        else return [res];
+      });
       onSuccess && onSuccess();
     },
     onError: async (err: Error) => {
@@ -98,13 +120,17 @@ export function useAddAdmin(onSuccess?: () => void, onError?: () => void) {
 }
 
 export function useDeleteAdmin(onSuccess?: () => void, onError?: () => void) {
+  const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { userName: string; password: string }) => {
+    mutationFn: async (data: { userName: string }) => {
       const res = await axios.delete("auth/admin", { data });
-      return res;
+      return res.data;
     },
     onSuccess: (_, variables) => {
       toast.success(variables.userName + " was deleted successfully");
+      queryClient.setQueryData<UserType[]>("admins", (old) => {
+        return old?.filter((ele) => ele.userName != variables.userName) || [];
+      });
       onSuccess && onSuccess();
     },
     onError: async (err: Error) => {

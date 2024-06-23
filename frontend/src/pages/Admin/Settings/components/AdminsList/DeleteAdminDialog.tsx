@@ -1,3 +1,4 @@
+import { useDeleteAdmin } from "@api/auth";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -11,10 +12,11 @@ import { FC } from "react";
 const DeleteAdminDialog: FC<{
   open: boolean;
   setOpen: (val: boolean) => void;
-  userId: string;
-}> = ({ open, setOpen, userId }) => {
+  userName: string;
+}> = ({ open, setOpen, userName }) => {
+  const { mutate: deleteAdmin, isLoading: deletingAdmin } = useDeleteAdmin();
   const handleDelete = () => {
-    console.log(userId);
+    deleteAdmin({ userName });
   };
   return (
     <Dialog
@@ -40,7 +42,11 @@ const DeleteAdminDialog: FC<{
       </DialogContent>
       <DialogActions>
         <LoadingButton onClick={() => setOpen(false)}>Cancel</LoadingButton>
-        <LoadingButton color="error" onClick={handleDelete}>
+        <LoadingButton
+          color="error"
+          loading={deletingAdmin}
+          onClick={handleDelete}
+        >
           Delete
         </LoadingButton>
       </DialogActions>

@@ -189,7 +189,7 @@ export default function CustomTable({
             order={order}
             orderBy={orderBy}
             onRequestSort={handleRequestSort}
-            rowCount={rows.length}
+            rowCount={rows?.length || 0}
           />
           <TableBody>
             {visibleRows.map((row) => {
@@ -218,7 +218,7 @@ export default function CustomTable({
       </TableContainer>
       <TablePagination
         component="div"
-        count={rows.length}
+        count={rows?.length || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
