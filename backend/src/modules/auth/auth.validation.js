@@ -29,10 +29,12 @@ const editUserSchema = joi.object({
     emailGas: joi.boolean(),
     emailVibration: joi.boolean(),
     temperatureRange: joi.object({
+      active: joi.boolean(),
       min: joi.number(),
       max: joi.number(),
     }),
     humidityRange: joi.object({
+      active: joi.boolean(),
       min: joi.number(),
       max: joi.number(),
     }),

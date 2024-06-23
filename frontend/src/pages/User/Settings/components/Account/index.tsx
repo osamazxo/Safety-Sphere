@@ -1,4 +1,4 @@
-import { useUpdateAccount } from "@api/auth";
+import { useGetAccount, useUpdateAccount } from "@api/auth";
 import {
   EmailOutlined,
   LockOutlined,
@@ -8,6 +8,13 @@ import { LoadingButton } from "@mui/lab";
 import { Box, SvgIconProps, TextField, Typography } from "@mui/material";
 import { FormikProps, useFormik } from "formik";
 import { FC, JSXElementConstructor } from "react";
+
+type FormikTypes = {
+  userName?: string;
+  password?: string;
+  cpassword?: string;
+  email?: string;
+};
 
 const CustomTextField = ({
   id,
@@ -20,12 +27,7 @@ const CustomTextField = ({
   Icon: JSXElementConstructor<SvgIconProps>;
   placeholder: string;
   type: "password" | "email" | "text";
-  formik: FormikProps<{
-    userName: string;
-    password: string;
-    cpassword: string;
-    email: string;
-  }>;
+  formik: FormikProps<FormikTypes>;
 }) => {
   return (
     <TextField
@@ -64,20 +66,28 @@ const CustomTextField = ({
 };
 
 const Account: FC<{ maxWidth?: string }> = ({ maxWidth = "600px" }) => {
+  const { data: currentUser } = useGetAccount();
   const { mutate: updateAccount, isLoading: updatingAccount } =
     useUpdateAccount();
-  const formik = useFormik({
+
+  const formik = useFormik<FormikTypes>({
     initialValues: {
-      userName: "",
+      userName: currentUser?.userName || "",
       password: "",
       cpassword: "",
-      email: "",
+      email: currentUser?.email || "",
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      updateAccount(values);
+      const updatedValues = { ...values };
+      if (values.password === "" || values.cpassword === "") {
+        updatedValues.password = undefined;
+        updatedValues.cpassword = undefined;
+      }
+      updateAccount(updatedValues);
     },
   });
+
   return (
     <Box
       sx={{

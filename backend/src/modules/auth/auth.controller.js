@@ -2,8 +2,10 @@ const User = require("../../../models/users");
 const Token = require("../../../models/tokens");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const CustomError = require("../../utils/CustomError");
+const { asyncHandler } = require("../../middlewares/asyncHandler");
 
-const signin = async (req, res) => {
+const signin = asyncHandler(async (req, res) => {
   const { userName, password } = req.body;
   try {
     const currentUser = await User.findOne({ userName });
@@ -43,62 +45,52 @@ const signin = async (req, res) => {
       message: err.message,
     });
   }
-};
+});
 
-const getUser = async (req, res) => {
+const getUser = asyncHandler(async (req, res) => {
   const currentUser = await User.findById(
     req.userId,
     "_id email userName preferences"
   );
   res.status(200).send({ user: currentUser });
-};
+});
 
-const editUser = async (req, res) => {
+const editUser = asyncHandler(async (req, res, next) => {
+  const currentUser = await User.findById(req.userId);
   //validate password
   const { password, cpassword, email, userName } = req.body;
   let hashedPass = null;
   if (password) {
     if (password !== cpassword)
-      res.status(400).send({ message: "Password doesn't match" });
+      return next(new CustomError("Password doesn't match"));
     hashedPass = await bcrypt.hash(password, 12);
   }
 
   if (email) {
     const emailUser = await User.findOne({ email });
-    if (emailUser)
-      res
-        .status(400)
-        .send({ message: "There is another user with this email" });
+    if (emailUser && !emailUser._id.equals(currentUser._id))
+      return next(new CustomError("There is another user with this email"));
   }
 
   if (userName) {
     const userNameUser = await User.findOne({ userName });
-    if (userNameUser)
-      res
-        .status(400)
-        .send({ message: "There is another user with this userName" });
+    if (userNameUser && !userNameUser._id.equals(currentUser._id))
+      throw new CustomError("There is another user with this userName");
   }
-
   //find and update user
-  const user = await User.findById(req.userId);
-  try {
-    await user.updateOne({ ...req.body, password: hashedPass });
-    res.status(201).send({ message: "updated successfully" });
-  } catch (err) {
-    res.status(400).send({ message: "there was an error" });
-    console.log(err);
-  }
-};
+  await currentUser.updateOne({ ...req.body, password: hashedPass });
+  return res.status(200).send({ message: "updated successfully" });
+});
 
-const getAdmins = async (req, res) => {
+const getAdmins = asyncHandler(async (req, res) => {
   const admins = await User.find(
     { role: "admin" },
     "_id userName email lastSeen"
   );
   res.status(200).send({ admins });
-};
+});
 
-const addAdmin = async (req, res) => {
+const addAdmin = asyncHandler(async (req, res) => {
   const { userName, password } = req.body;
 
   // check if another user with the same userName exist
@@ -120,9 +112,9 @@ const addAdmin = async (req, res) => {
       message: "There was an error saving the new admin in database",
     });
   }
-};
+});
 
-const deleteAdmin = async (req, res) => {
+const deleteAdmin = asyncHandler(async (req, res) => {
   const { userName } = req.body;
   try {
     await User.findOneAndDelete({ userName });
@@ -130,7 +122,7 @@ const deleteAdmin = async (req, res) => {
   } catch (err) {
     res.status(400).send({ message: "There was an error deleting this user" });
   }
-};
+});
 
 exports.signin = signin;
 exports.getUser = getUser;

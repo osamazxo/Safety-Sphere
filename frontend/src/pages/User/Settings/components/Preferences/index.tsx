@@ -1,34 +1,44 @@
+import { useGetAccount, useUpdateAccount } from "@api/auth";
 import { LoadingButton } from "@mui/lab";
-import { Box, Switch, Typography } from "@mui/material";
-import { FormikProps, useFormik } from "formik";
-import { FC } from "react";
-const CheckInput: FC<{
-  label: string;
-  id: "gasNotify" | "vibrationNotify";
-  formik: FormikProps<{
-    gasNotify: boolean;
-    vibrationNotify: boolean;
-  }>;
-}> = ({ label, id, formik }) => {
-  return (
-    <Box display="flex" alignItems="center" justifyContent="space-between">
-      <Typography>{label}</Typography>
-      <Switch
-        onChange={(e) => formik.setFieldValue(id, e.target.checked)}
-        checked={formik.values[id]}
-      />
-    </Box>
-  );
+import { Box, Switch, TextField, Typography } from "@mui/material";
+import { useFormik } from "formik";
+type PreferenceType = {
+  temperatureRange: {
+    active: boolean;
+    min: number;
+    max: number;
+  };
+  humidityRange: {
+    active: boolean;
+    min: number;
+    max: number;
+  };
+  emailGas: boolean;
+  emailVibration: boolean;
 };
 const Preferences = () => {
-  const formik = useFormik({
+  const { data: account } = useGetAccount();
+  const prefernces = account?.preferences;
+  const { mutate: updateAccount, isLoading: updatingAccount } =
+    useUpdateAccount();
+  const formik = useFormik<PreferenceType>({
     initialValues: {
-      gasNotify: false,
-      vibrationNotify: true,
+      temperatureRange: {
+        active: prefernces?.temperatureRange?.active || false,
+        min: prefernces?.temperatureRange?.min || 0,
+        max: prefernces?.temperatureRange?.max || 0,
+      },
+      humidityRange: {
+        active: prefernces?.humidityRange?.active || false,
+        min: prefernces?.humidityRange?.min || 0,
+        max: prefernces?.humidityRange?.max || 0,
+      },
+      emailGas: prefernces?.emailGas || false,
+      emailVibration: prefernces?.emailVibration || false,
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      console.log(values);
+      updateAccount({ preferences: values });
     },
   });
   return (
@@ -58,19 +68,121 @@ const Preferences = () => {
         component="form"
         onSubmit={formik.handleSubmit}
       >
-        <CheckInput
-          id="gasNotify"
-          label="Email me when there is a gas leak."
-          formik={formik}
-        />
-        <CheckInput
-          id="vibrationNotify"
-          label="Email me when there is a vibration."
-          formik={formik}
-        />
+        {/* **************** email gas **************** */}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography>Email me when there is a gas leak.</Typography>
+          <Switch
+            onChange={(e) => formik.setFieldValue("emailGas", e.target.checked)}
+            checked={formik.values.emailGas}
+          />
+        </Box>
+        {/* **************** email vibration **************** */}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography>Email me when there is a vibration.</Typography>
+          <Switch
+            onChange={(e) =>
+              formik.setFieldValue("emailVibration", e.target.checked)
+            }
+            checked={formik.values.emailVibration}
+          />
+        </Box>
+        {/* **************** email temperature **************** */}
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb="8px"
+        >
+          <Box>
+            <Typography mb="8px">
+              Email me when the temperature is not in the range
+            </Typography>
+            <Box display="flex" gap="16px" alignItems="center">
+              <TextField
+                placeholder="min"
+                sx={{ maxWidth: "70px" }}
+                value={formik.values.temperatureRange.min}
+                disabled={!formik.values.temperatureRange.active}
+                onChange={(e) =>
+                  formik.setFieldValue("temperatureRange", {
+                    ...formik.values.temperatureRange,
+                    min: e.target.value,
+                  })
+                }
+              />
+              -
+              <TextField
+                placeholder="max"
+                sx={{ maxWidth: "70px" }}
+                value={formik.values.temperatureRange.max}
+                disabled={!formik.values.temperatureRange.active}
+                onChange={(e) =>
+                  formik.setFieldValue("temperatureRange", {
+                    ...formik.values.temperatureRange,
+                    max: e.target.value,
+                  })
+                }
+              />
+            </Box>
+          </Box>
+          <Switch
+            onChange={(e) =>
+              formik.setFieldValue("temperatureRange", {
+                ...formik.values.temperatureRange,
+                active: e.target.checked,
+              })
+            }
+            checked={formik.values.temperatureRange.active}
+          />
+        </Box>
+        {/* **************** email humidity **************** */}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography mb="8px">
+              Email me when the humidity is not in the range
+            </Typography>
+            <Box display="flex" gap="16px" alignItems="center">
+              <TextField
+                placeholder="min"
+                sx={{ maxWidth: "70px" }}
+                value={formik.values.humidityRange.min}
+                disabled={!formik.values.humidityRange.active}
+                onChange={(e) =>
+                  formik.setFieldValue("humidityRange", {
+                    ...formik.values.humidityRange,
+                    min: e.target.value,
+                  })
+                }
+              />
+              -
+              <TextField
+                placeholder="max"
+                sx={{ maxWidth: "70px" }}
+                value={formik.values.humidityRange.max}
+                disabled={!formik.values.humidityRange.active}
+                onChange={(e) =>
+                  formik.setFieldValue("humidityRange", {
+                    ...formik.values.humidityRange,
+                    max: e.target.value,
+                  })
+                }
+              />
+            </Box>
+          </Box>
+          <Switch
+            onChange={(e) =>
+              formik.setFieldValue("humidityRange", {
+                ...formik.values.humidityRange,
+                active: e.target.checked,
+              })
+            }
+            checked={formik.values.humidityRange.active}
+          />
+        </Box>
         <LoadingButton
           variant="outlined"
           type="submit"
+          loading={updatingAccount}
           sx={{
             alignSelf: "flex-end",
             width: "fit-content",
