@@ -11,6 +11,14 @@ const {
 const router = express.Router();
 
 router.post("/signin", validation(signinSchema), authController.signin);
+router.get("/user", isAuth, authController.getUser);
+router.patch(
+  "/user",
+  isAuth,
+  validation(editUserSchema),
+  authController.editUser
+);
+router.get("/admin", isAuth, isAdmin, authController.getAdmins);
 router.post(
   "/admin",
   isAuth,
@@ -24,12 +32,6 @@ router.delete(
   isAdmin,
   validation(deleteAdminSchema),
   authController.deleteAdmin
-);
-router.patch(
-  "/user",
-  isAuth,
-  validation(editUserSchema),
-  authController.editUser
 );
 
 module.exports = router;

@@ -45,6 +45,59 @@ const signin = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  const currentUser = await User.findById(
+    req.userId,
+    "_id email userName preferences"
+  );
+  res.status(200).send({ user: currentUser });
+};
+
+const editUser = async (req, res) => {
+  //validate password
+  const { password, cpassword, email, userName } = req.body;
+  let hashedPass = null;
+  if (password) {
+    if (password !== cpassword)
+      res.status(400).send({ message: "Password doesn't match" });
+    hashedPass = await bcrypt.hash(password, 12);
+  }
+
+  if (email) {
+    const emailUser = await User.findOne({ email });
+    if (emailUser)
+      res
+        .status(400)
+        .send({ message: "There is another user with this email" });
+  }
+
+  if (userName) {
+    const userNameUser = await User.findOne({ userName });
+    if (userNameUser)
+      res
+        .status(400)
+        .send({ message: "There is another user with this userName" });
+  }
+
+  //find and update user
+  const user = await User.findById(req.userId);
+  try {
+    await user.updateOne({ ...req.body, password: hashedPass });
+    res.status(201).send({ message: "updated successfully" });
+  } catch (err) {
+    res.status(400).send({ message: "there was an error" });
+    console.log(err);
+  }
+};
+
+const getAdmins = async (req, res) => {
+  const admins = await User.find(
+    { role: "admin" },
+    "_id userName email lastSeen"
+  );
+  res.status(200).send({ admins });
+};
+
 const addAdmin = async (req, res) => {
   const { userName, password } = req.body;
 
@@ -79,28 +132,9 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
-const editUser = async (req, res) => {
-  //validate password
-  const { password, cpassword } = req.body;
-  let hashedPass = null;
-  if (password) {
-    if (password !== cpassword)
-      res.status(400).send({ message: "Password doesn't match" });
-    hashedPass = await bcrypt.hash(password, 12);
-  }
-
-  //find and update user
-  const user = await User.findById(req.userId);
-  try {
-    await user.updateOne({ ...req.body, password: hashedPass });
-    res.status(201).send({ message: "updated successfully" });
-  } catch (err) {
-    res.status(400).send({ message: "there was an error" });
-    console.log(err);
-  }
-};
-
 exports.signin = signin;
+exports.getUser = getUser;
+exports.editUser = editUser;
+exports.getAdmins = getAdmins;
 exports.addAdmin = addAdmin;
 exports.deleteAdmin = deleteAdmin;
-exports.editUser = editUser;
