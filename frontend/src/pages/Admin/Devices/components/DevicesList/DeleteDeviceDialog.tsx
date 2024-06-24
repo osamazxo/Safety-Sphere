@@ -24,8 +24,9 @@ const DeleteDeviceDialog: FC<{
       open={open}
       onClose={() => setOpen(false)}
       PaperProps={{
+        elevation: 3,
         sx: {
-          maxWidth: "500px",
+          borderRadius: "8px",
         },
       }}
     >

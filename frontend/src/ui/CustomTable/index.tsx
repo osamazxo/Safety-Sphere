@@ -15,6 +15,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
+import Spinner from "@ui/Spinner";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -130,6 +131,8 @@ export default function CustomTable({
   rowsPerPage = 10,
   showHeader = true,
   startSlot,
+  isLoading = false,
+  isError = false,
 }: {
   headCells: HeadCell[];
   rows: Row[];
@@ -137,6 +140,8 @@ export default function CustomTable({
   rowsPerPage?: number;
   showHeader?: boolean;
   startSlot?: React.ReactNode;
+  isLoading?: boolean;
+  isError?: boolean;
 }) {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<string>("calories");
@@ -173,49 +178,72 @@ export default function CustomTable({
     >
       {startSlot}
       {showHeader && <EnhancedTableToolbar title={title} />}
-      <TableContainer>
-        <Table
-          sx={{
-            minWidth: 750,
-            "& th, & td": {
-              borderColor: (theme) => theme.common.border,
-            },
-          }}
-          aria-labelledby={title}
-          size={"medium"}
+
+      {isLoading ? (
+        <Spinner sx={{ height: "250px" }} />
+      ) : isError ? (
+        <Box
+          height="200px"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
         >
-          <EnhancedTableHead
-            headCells={headCells}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-            rowCount={rows?.length || 0}
-          />
-          <TableBody>
-            {visibleRows.map((row) => {
-              return (
-                <TableRow hover tabIndex={-1} key={row.id}>
-                  <TableCell component="th" id={row.id + ""} scope="row">
-                    {row[headCells[0].id]}
-                  </TableCell>
-                  {headCells.map((headCell, index) =>
-                    index === 0 ? (
-                      ""
-                    ) : (
-                      <TableCell
-                        align="left"
-                        key={index + "" + row[headCell.id]}
-                      >
-                        {row[headCell.id]}
-                      </TableCell>
-                    )
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <Typography color="error">There was an error!</Typography>
+        </Box>
+      ) : rows.length === 0 ? (
+        <Box
+          height="200px"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Typography>There is no data!</Typography>
+        </Box>
+      ) : (
+        <TableContainer>
+          <Table
+            sx={{
+              minWidth: 750,
+              "& th, & td": {
+                borderColor: (theme) => theme.common.border,
+              },
+            }}
+            aria-labelledby={title}
+            size={"medium"}
+          >
+            <EnhancedTableHead
+              headCells={headCells}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              rowCount={rows?.length || 0}
+            />
+            <TableBody>
+              {visibleRows.map((row) => {
+                return (
+                  <TableRow hover tabIndex={-1} key={row.id}>
+                    <TableCell component="th" id={row.id + ""} scope="row">
+                      {row[headCells[0].id]}
+                    </TableCell>
+                    {headCells.map((headCell, index) =>
+                      index === 0 ? (
+                        ""
+                      ) : (
+                        <TableCell
+                          align="left"
+                          key={index + "" + row[headCell.id]}
+                        >
+                          {row[headCell.id]}
+                        </TableCell>
+                      )
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       <TablePagination
         component="div"
         count={rows?.length || 0}

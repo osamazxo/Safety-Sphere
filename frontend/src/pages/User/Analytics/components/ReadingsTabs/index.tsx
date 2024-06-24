@@ -5,6 +5,7 @@ import HumidityTab from "./HumidityTab";
 import GasTab from "./GasTab";
 import VibrationTab from "./VibrationTab";
 import { MonthlyStatics, useGetUserAnalytics } from "@api/analytics";
+import Spinner from "@ui/Spinner";
 
 const tabs = ["temperature", "humidity", "gas", "vibration"];
 const getTab = (data?: MonthlyStatics) => ({
@@ -35,7 +36,13 @@ const ReadingTabs = () => {
           />
         ))}
       </Tabs>
-      {isLoading ? "" : isError ? "" : getTab(data)[currentTab]}
+      {isLoading ? (
+        <Spinner sx={{ height: "400px" }} />
+      ) : isError ? (
+        ""
+      ) : (
+        getTab(data)[currentTab]
+      )}
     </>
   );
 };

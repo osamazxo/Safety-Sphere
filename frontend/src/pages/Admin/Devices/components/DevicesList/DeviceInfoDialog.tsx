@@ -1,9 +1,12 @@
 import { DeviceType } from "@api/devices";
+import { Close } from "@mui/icons-material";
 import {
+  Box,
   Dialog,
   DialogContent,
-  DialogContentText,
   DialogTitle,
+  IconButton,
+  Typography,
 } from "@mui/material";
 import { FC } from "react";
 
@@ -13,12 +16,29 @@ const DeviceInfoDialog: FC<{
   setOpen: (val: boolean) => void;
 }> = ({ device, open, setOpen }) => {
   return (
-    <Dialog open={open} onClose={() => setOpen(false)}>
-      <DialogTitle>Device Info</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={() => setOpen(false)}
+      PaperProps={{
+        elevation: 3,
+        sx: {
+          borderRadius: "8px",
+        },
+      }}
+    >
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <DialogTitle>Device Info</DialogTitle>
+        <IconButton
+          sx={{ p: "4px", mr: "16px" }}
+          onClick={() => setOpen(false)}
+        >
+          <Close fontSize="small" />
+        </IconButton>
+      </Box>
       <DialogContent>
-        <DialogContentText>
-          Are you sure you want to delete this device?
-        </DialogContentText>
+        <Typography>Device ID: {device._id}</Typography>
+        <Typography>Username: {device.user?.userName}</Typography>
+        <Typography>Device Secret: {device.secret}</Typography>
       </DialogContent>
     </Dialog>
   );

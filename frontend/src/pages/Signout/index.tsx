@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import Spinner from "@ui/Spinner";
 import { useEffect } from "react";
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -12,11 +12,7 @@ const Signout = () => {
     queryClient.clear();
     navigate("/signin");
   }, [navigate, queryClient]);
-  return (
-    <Box className="f-center-center" minHeight="100vh">
-      <div className="loader" />
-    </Box>
-  );
+  return <Spinner sx={{ height: "100vh" }} />;
 };
 
 export default Signout;

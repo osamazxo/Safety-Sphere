@@ -46,8 +46,9 @@ const EditDeviceDialog: FC<{
       PaperProps={{
         component: "form",
         onSubmit: formik.handleSubmit,
+        elevation: 3,
         sx: {
-          maxWidth: "500px",
+          borderRadius: "8px",
         },
       }}
     >

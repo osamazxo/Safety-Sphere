@@ -13,6 +13,7 @@ import {
 import { Helmet } from "react-helmet-async";
 import { useGetAdminDashboard } from "@api/dashboard";
 import { getLastDates } from "@util/dateHelpers";
+import Spinner from "@ui/Spinner";
 
 const iconStyle: SxProps = {
   color: "text.secondary",
@@ -32,7 +33,7 @@ const Home = () => {
         <title>Admin Dashboard | Safety Sphere</title>
       </Helmet>
       {isLoading ? (
-        ""
+        <Spinner sx={{ height: "100vh" }} />
       ) : isError ? (
         ""
       ) : (

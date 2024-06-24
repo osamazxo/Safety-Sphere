@@ -48,13 +48,15 @@ const createData = (
 });
 const AdminsList = () => {
   const [addAdminOpened, setAddAdminOpened] = useState<boolean>(false);
-  const { data: adminsList } = useGetAdmins();
+  const { data: adminsList, isLoading, isError } = useGetAdmins();
   return (
     <Box maxWidth="800px">
       <CustomTable
         title="Admins List"
         showHeader={false}
         headCells={headCells}
+        isLoading={isLoading}
+        isError={isError}
         startSlot={
           <Box
             display="flex"
