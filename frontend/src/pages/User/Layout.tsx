@@ -1,8 +1,9 @@
 import { Analytics, Home, Logout, Settings } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import CustomDrawer from "@ui/CustomDrawer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import Header from "@ui/Header";
+import { useEffect } from "react";
 
 const drawerItems = [
   {
@@ -28,6 +29,12 @@ const drawerItems = [
 ];
 
 function Layout() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("role") === "admin") {
+      return navigate("/admin");
+    }
+  }, [navigate]);
   return (
     <Box display="flex">
       <CustomDrawer items={drawerItems} />
