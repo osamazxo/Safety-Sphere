@@ -11,7 +11,7 @@ const isAuth = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    res.status(401).send({
+    return res.status(401).send({
       message: "Please login first",
     });
   }
@@ -21,7 +21,7 @@ const isAdmin = async (req, res, next) => {
   // check if the user have access to add admin
   const currentUser = await User.findById(req.userId);
   if (currentUser.role !== "admin")
-    res.status("403").send({ message: "You don't have access" });
+    return res.status("403").send({ message: "You don't have access" });
   next();
 };
 

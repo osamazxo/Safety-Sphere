@@ -49,7 +49,7 @@ const addDevice = asyncHandler(async (req, res) => {
 
   newDevice.user = newUser._id;
   await newDevice.save();
-  return res.send(await newDevice.populate("user", "userName"));
+  return res.status(201).send(await newDevice.populate("user", "userName"));
 });
 
 const editDevice = asyncHandler(async (req, res) => {

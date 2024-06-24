@@ -226,7 +226,7 @@ const addReading = asyncHandler(async (req, res) => {
       activeDevicesToday.devices.push(currentDevice._id);
     await activeDevicesToday.save();
   }
-  await res.status(201).send({ message: "done" });
+  return res.status(201).send({ message: "done" });
 });
 
 exports.addReading = addReading;

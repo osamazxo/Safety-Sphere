@@ -7,44 +7,38 @@ const { asyncHandler } = require("../../middlewares/asyncHandler");
 
 const signin = asyncHandler(async (req, res) => {
   const { userName, password } = req.body;
-  try {
-    const currentUser = await User.findOne({ userName });
-    if (!currentUser) throw Error("Invalid username");
-    const passwordMatch = await bcrypt.compare(password, currentUser.password);
-    if (!passwordMatch) throw Error("Invalid password");
-    const token = jwt.sign(
-      {
-        userName,
-        _id: currentUser._id,
-      },
-      process.env.AUTH_PRIVATE_KEY,
-      {
-        expiresIn: "7 days",
-      }
-    );
-
-    // allow only 3 connected devices
-    const allUserTokens = await Token.find({ user: currentUser._id });
-    if (allUserTokens.length > 2) {
-      await allUserTokens[0].deleteOne();
+  const currentUser = await User.findOne({ userName });
+  if (!currentUser) throw Error("Invalid username");
+  const passwordMatch = await bcrypt.compare(password, currentUser.password);
+  if (!passwordMatch) throw Error("Invalid password");
+  const token = jwt.sign(
+    {
+      userName,
+      _id: currentUser._id,
+    },
+    process.env.AUTH_PRIVATE_KEY,
+    {
+      expiresIn: "7 days",
     }
+  );
 
-    const newToken = new Token({
-      token,
-      user: currentUser._id,
-      role: currentUser.role,
-      valid: true,
-    });
-    await newToken.save();
-    res.send({
-      token,
-      role: currentUser.role,
-    });
-  } catch (err) {
-    res.status(400).send({
-      message: err.message,
-    });
+  // allow only 3 connected devices
+  const allUserTokens = await Token.find({ user: currentUser._id });
+  if (allUserTokens.length > 2) {
+    await allUserTokens[0].deleteOne();
   }
+
+  const newToken = new Token({
+    token,
+    user: currentUser._id,
+    role: currentUser.role,
+    valid: true,
+  });
+  await newToken.save();
+  return res.status(200).send({
+    token,
+    role: currentUser.role,
+  });
 });
 
 const getUser = asyncHandler(async (req, res) => {
@@ -52,7 +46,7 @@ const getUser = asyncHandler(async (req, res) => {
     req.userId,
     "_id email userName preferences"
   );
-  res.status(200).send({ user: currentUser });
+  return res.status(200).send({ user: currentUser });
 });
 
 const editUser = asyncHandler(async (req, res, next) => {
@@ -87,7 +81,7 @@ const getAdmins = asyncHandler(async (req, res) => {
     { role: "admin" },
     "_id userName email lastSeen"
   );
-  res.status(200).send({ admins });
+  return res.status(200).send({ admins });
 });
 
 const addAdmin = asyncHandler(async (req, res) => {
@@ -105,7 +99,7 @@ const addAdmin = asyncHandler(async (req, res) => {
     role: "admin",
   });
   await newUser.save();
-  res.status(201).send(newUser);
+  return res.status(201).send(newUser);
 });
 
 const deleteAdmin = asyncHandler(async (req, res) => {
