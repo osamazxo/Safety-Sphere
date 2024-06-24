@@ -110,12 +110,9 @@ const addAdmin = asyncHandler(async (req, res) => {
 
 const deleteAdmin = asyncHandler(async (req, res) => {
   const { userName } = req.body;
-  try {
-    await User.findOneAndDelete({ userName });
-    res.status(200).send({ message: "User was deleted successfully" });
-  } catch (err) {
-    res.status(400).send({ message: "There was an error deleting this user" });
-  }
+  if (userName === "admin") throw new CustomError("You can't delete this user");
+  await User.findOneAndDelete({ userName });
+  return res.status(200).send({ message: "User was deleted successfully" });
 });
 
 exports.signin = signin;
