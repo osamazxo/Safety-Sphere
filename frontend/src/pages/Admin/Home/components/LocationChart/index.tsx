@@ -1,6 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import PieChart from "@ui/PieChart";
-const LocationChart = () => {
+import { FC } from "react";
+const LocationChart: FC<{ location: { _id: string; total: number }[] }> = ({
+  location,
+}) => {
   return (
     <Box
       minHeight="260px"
@@ -14,7 +17,10 @@ const LocationChart = () => {
         position: "relative",
       }}
     >
-      <PieChart labels={["Egypt", "USA", "Jordan"]} series={[50, 30, 20]} />
+      <PieChart
+        labels={location.map((ele) => ele._id)}
+        series={location.map((ele) => ele.total)}
+      />
       <Typography variant="subtitle1" position="absolute" fontWeight="600">
         Location
       </Typography>

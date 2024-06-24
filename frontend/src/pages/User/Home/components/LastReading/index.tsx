@@ -1,44 +1,39 @@
+import { FC } from "react";
 import Item from "./Item";
-import {
-  DeviceThermostatOutlined,
-  WaterDropOutlined,
-} from "@mui/icons-material";
 
-const LastReading = () => {
+import { ReadingType } from "@api/dashboard";
+
+const LastReading: FC<{ reading?: ReadingType }> = ({ reading }) => {
   return (
     <>
       <Item
         item={{
           title: "Temperature",
-          value: 54,
+          value: reading?.temperature !== undefined ? reading.temperature : "-",
           symbol: "°C",
-          icon: <DeviceThermostatOutlined />,
-          date: new Date().toISOString(),
+          date: reading?.time || "",
         }}
       />
       <Item
         item={{
           title: "Humidity",
-          value: 70,
+          value: reading?.humidity !== undefined ? reading.humidity : "-",
           symbol: "%",
-          icon: <WaterDropOutlined />,
-          date: new Date().toISOString(),
+          date: reading?.time || "",
         }}
       />
       <Item
         item={{
           title: "Gas",
-          value: 0,
-          icon: <DeviceThermostatOutlined />,
-          date: new Date().toISOString(),
+          value: reading?.gas !== undefined ? reading.gas : "-",
+          date: reading?.time || "",
         }}
       />
       <Item
         item={{
           title: "Vibration",
-          value: 0,
-          icon: <DeviceThermostatOutlined />,
-          date: new Date().toISOString(),
+          value: reading?.vibration !== undefined ? reading.vibration : "-",
+          date: reading?.time || "",
         }}
       />
     </>

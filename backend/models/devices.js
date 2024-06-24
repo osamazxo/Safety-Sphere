@@ -25,6 +25,11 @@ const deviceSchema = new Schema(
     humidity: Number,
     vibration: Number,
     gas: Number,
+    totalReadings: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
   },
   { timestamps: true }
 );

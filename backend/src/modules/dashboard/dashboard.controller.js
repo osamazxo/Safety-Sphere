@@ -2,6 +2,8 @@ const User = require("../../../models/users");
 const Device = require("../../../models/devices");
 const Alert = require("../../../models/alerts");
 const DailyStatics = require("../../../models/dailyStatics");
+const ActiveDevices = require("../../../models/activeDevices");
+const { asyncHandler } = require("../../middlewares/asyncHandler");
 
 const getActiveDevicesCount = async () => {
   const today = new Date();
@@ -20,7 +22,7 @@ const getActiveDevicesCount = async () => {
   return totalActiveDevices;
 };
 
-const getUserDashboard = async (req, res) => {
+const getUserDashboard = asyncHandler(async (req, res) => {
   try {
     const currentUser = await User.findById(req.userId);
     const currentDevice = await Device.findOne({ user: req.userId });
@@ -37,6 +39,13 @@ const getUserDashboard = async (req, res) => {
     const latestAlerts = await Alert.find({ device: currentDevice._id }, [], {
       sort: { createdAt: -1 },
       limit: 5,
+    }).populate({
+      path: "device",
+      select: "user",
+      populate: {
+        path: "user",
+        select: "userName",
+      },
     });
 
     res.status(200).send({
@@ -54,13 +63,16 @@ const getUserDashboard = async (req, res) => {
   } catch (err) {
     res.status(400).send({ message: err.message });
   }
-};
+});
 
-const getAdminDashboard = async (req, res) => {
+const getAdminDashboard = asyncHandler(async (req, res) => {
   try {
     const totalDevices = await Device.estimatedDocumentCount();
     const totalActiveDevices = await getActiveDevicesCount();
     const totalAlerts = await Alert.estimatedDocumentCount();
+    const totalReadings = (await Device.find({})).reduce(
+      (a, b) => a.totalReadings + b.totalReadings
+    );
     const location = await Device.aggregate([
       {
         $group: {
@@ -78,19 +90,35 @@ const getAdminDashboard = async (req, res) => {
         },
         limit: 5,
       }
-    );
-
+    ).populate({
+      path: "device",
+      select: "user",
+      populate: {
+        path: "user",
+        select: "userName",
+      },
+    });
+    const lastWeekDate = new Date();
+    lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+    const activeDevicesSeries = await ActiveDevices.find({
+      createdAt: { $gt: lastWeekDate },
+    });
     res.status(200).send({
       totalDevices,
       totalActiveDevices,
       totalAlerts,
+      totalReadings,
       location,
       latestAlerts,
+      activeDevicesSeries: activeDevicesSeries.map((ele) => ({
+        date: ele.date,
+        total: ele.devices.length,
+      })),
     });
   } catch (err) {
     res.status(400).send({ message: err.message });
   }
-};
+});
 
 exports.getUserDashboard = getUserDashboard;
 exports.getAdminDashboard = getAdminDashboard;

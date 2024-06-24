@@ -1,19 +1,21 @@
-const Reading = require("../../../models/readings");
 const Device = require("../../../models/devices");
 const User = require("../../../models/users");
 const DailyStatics = require("../../../models/dailyStatics");
+const ActiveDevices = require("../../../models/activeDevices");
 const Alert = require("../../../models/alerts");
+const { asyncHandler } = require("../../middlewares/asyncHandler");
+const CustomError = require("../../utils/CustomError");
 
 const getDeviceObject = async (req, res) => {
   const { device: deviceId, secret } = req.query;
   const currentDevice = await Device.findById(deviceId);
-  if (!currentDevice) res.status(404).send({ message: "Device not found" });
+  if (!currentDevice) throw new CustomError("Device not found", 404);
   if (currentDevice.secret !== secret)
-    res.status(403).send({ message: "Incorrect device secret" });
+    throw new CustomError("Incorrect device secret", 403);
   return currentDevice;
 };
 
-const addReading = async (req, res) => {
+const addReading = asyncHandler(async (req, res) => {
   const currentDevice = await getDeviceObject(req, res);
   const deviceUser = await User.findById(currentDevice.user);
   let { temperature, humidity, gas, vibration } = req.body;
@@ -24,6 +26,7 @@ const addReading = async (req, res) => {
     ...req.body,
     lastSeen: new Date().toISOString(),
     location: ipLocation || "Unknown",
+    totalReadings: currentDevice.totalReadings + 1,
   });
 
   // add the reading to daily statics
@@ -199,17 +202,31 @@ const addReading = async (req, res) => {
       }
     }
   }
-
   await dailyStatics.save();
-  res.status(201).send({ message: "done" });
-};
 
-const getReadings = async (req, res) => {
-  const currentUser = await User.findById(req.userId);
-  const readings = await Reading.find({
-    device: currentUser.device,
+  // set device active today
+  const todayDate = new Date().toISOString().slice(0, 10);
+  let activeDevicesToday = await ActiveDevices.findOne({
+    date: todayDate,
   });
-  res.send(readings);
-};
+  if (!activeDevicesToday) {
+    activeDevicesToday = new ActiveDevices({
+      date: todayDate,
+      devices: [currentDevice._id],
+    });
+    console.log("hellooooooo", todayDate, activeDevicesToday);
+
+    await activeDevicesToday.save();
+  } else {
+    if (
+      !activeDevicesToday.devices.find((ele) =>
+        ele._id.equals(currentDevice._id)
+      )
+    )
+      activeDevicesToday.devices.push(currentDevice._id);
+    await activeDevicesToday.save();
+  }
+  await res.status(201).send({ message: "done" });
+});
+
 exports.addReading = addReading;
-exports.getReadings = getReadings;

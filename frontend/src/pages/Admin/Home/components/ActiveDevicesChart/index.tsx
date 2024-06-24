@@ -1,12 +1,16 @@
 import AreaChart from "@ui/AreaChart";
+import { FC } from "react";
 
-const ActiveDevicesChart = () => {
+const ActiveDevicesChart: FC<{
+  categories: string[];
+  series: number[];
+}> = ({ categories, series }) => {
   return (
     <AreaChart
       label="Active Devices"
       name="active devices"
-      categories={["sun", "mon", "tue"]}
-      data={[5, 7, 2]}
+      categories={categories}
+      data={series}
       height="260px"
     />
   );

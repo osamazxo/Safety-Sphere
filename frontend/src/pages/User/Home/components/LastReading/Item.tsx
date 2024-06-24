@@ -1,11 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import { FC, ReactElement } from "react";
+import { FC } from "react";
 
 export type ReadingItem = {
-  value: number;
+  value: number | string;
   title: string;
-  icon: ReactElement;
   date: string;
   symbol?: string;
 };
