@@ -9,7 +9,7 @@ const CustomDrawer: FC<{
 }> = ({ items }) => {
   const params = useGetParams();
   let activeItem = params[0].toLowerCase();
-  if (activeItem === "user") activeItem = "home";
+  if (activeItem === "user" || activeItem === "admin") activeItem = "home";
   return (
     <Box
       className="main-drawer"
