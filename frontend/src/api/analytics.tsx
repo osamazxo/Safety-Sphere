@@ -1,6 +1,8 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useQuery } from "react-query";
 import { AlertType } from "./dashboard";
+import toast from "react-hot-toast";
+import { checkErrorStatus } from "@util/checkErrorStatus";
 
 export type MonthlyStatics = {
   date: string;
@@ -23,6 +25,12 @@ export function useGetUserAnalytics(
         "analytics?sensor=" + sensor
       );
       return res.data.monthlyStatics;
+    },
+    staleTime: 60000 * 3,
+    refetchInterval: 60000 * 3,
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
     },
   });
   return query;

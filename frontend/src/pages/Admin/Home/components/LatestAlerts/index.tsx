@@ -38,7 +38,9 @@ const LatestAlerts: FC<{
         {alerts.length === 0 ? (
           <Typography>There is no new alert.</Typography>
         ) : (
-          alerts.map((ele) => <Item alert={ele} showUserName={showUserName} />)
+          alerts.map((ele) => (
+            <Item key={ele._id} alert={ele} showUserName={showUserName} />
+          ))
         )}
       </Box>
     </Box>

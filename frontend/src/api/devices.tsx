@@ -1,3 +1,4 @@
+import { checkErrorStatus } from "@util/checkErrorStatus";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -19,12 +20,18 @@ export type DeviceType = {
   };
 };
 
-export function useGetDevices() {
-  const query = useQuery<DeviceType[]>({
+export function useGetDevices(onSuccess?: () => void, onError?: () => void) {
+  const query = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const res = await axios.get("devices");
+      const res = await axios.get<{ devices: DeviceType[] }>("devices");
       return res.data.devices;
+    },
+    onSuccess,
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
+      onError && onError();
     },
   });
   return query;
@@ -46,9 +53,8 @@ export function useAddDevice(onSuccess?: () => void, onError?: () => void) {
       onSuccess && onSuccess();
     },
     onError: (err: AxiosError<{ message: string }>) => {
-      toast.error(
-        err.response?.data?.message || "There was an error adding this device"
-      );
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });
@@ -82,9 +88,8 @@ export function useEditDevice(onSuccess?: () => void, onError?: () => void) {
       onSuccess && onSuccess();
     },
     onError: (err: AxiosError<{ message: string }>) => {
-      toast.error(
-        err.response?.data?.message || "There was an error updating this device"
-      );
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });
@@ -107,9 +112,8 @@ export function useDeleteDevice(onSuccess?: () => void, onError?: () => void) {
       onSuccess && onSuccess();
     },
     onError: (err: AxiosError<{ message: string }>) => {
-      toast.error(
-        err.response?.data?.message || "There was an error updating this device"
-      );
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });

@@ -16,6 +16,9 @@ const Item: FC<{
     <Box
       component={Link}
       to={item.url}
+      onClick={() => {
+        document.querySelector(".main-drawer")?.classList.toggle("open");
+      }}
       sx={{
         display: "flex",
         alignItems: "center",

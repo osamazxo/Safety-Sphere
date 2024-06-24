@@ -1,3 +1,4 @@
+import { checkErrorStatus } from "@util/checkErrorStatus";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -29,7 +30,7 @@ type UserType = {
   lastSeen: string;
   email: string;
 };
-export function useSignin() {
+export function useSignin(onSuccess?: () => void, onError?: () => void) {
   const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: async (data: { userName: string; password: string }) => {
@@ -41,25 +42,30 @@ export function useSignin() {
       axios.defaults.headers.common["token"] = res.token;
       localStorage.setItem("role", res.role);
       toast.success("Welcome Back!");
+      onSuccess && onSuccess();
       navigate("/");
     },
-    onError: (
-      res: AxiosError<{
-        message: string;
-      }>
-    ) => {
-      toast.error(res?.response?.data.message || "There was an error");
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
+      onError && onError();
     },
   });
   return mutation;
 }
 
-export function useGetAccount() {
-  const query = useQuery<AccountType>({
+export function useGetAccount(onSuccess?: () => void, onError?: () => void) {
+  const query = useQuery({
     queryKey: ["user", "me"],
     queryFn: async () => {
-      const res = await axios.get("auth/user");
+      const res = await axios.get<{ user: AccountType }>("auth/user");
       return res.data.user;
+    },
+    onSuccess,
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
+      onError && onError();
     },
   });
   return query;
@@ -75,8 +81,9 @@ export function useUpdateAccount(onSuccess?: () => void, onError?: () => void) {
       toast.success("Your account was updated successfully");
       onSuccess && onSuccess();
     },
-    onError: (res: Error) => {
-      toast.error(res.message);
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });
@@ -84,12 +91,18 @@ export function useUpdateAccount(onSuccess?: () => void, onError?: () => void) {
 }
 
 // admin routes
-export function useGetAdmins() {
-  const query = useQuery<UserType[]>({
+export function useGetAdmins(onSuccess?: () => void, onError?: () => void) {
+  const query = useQuery({
     queryKey: ["admins"],
     queryFn: async () => {
-      const res = await axios.get("auth/admin");
+      const res = await axios.get<{ admins: UserType[] }>("auth/admin");
       return res.data.admins;
+    },
+    onSuccess,
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
+      onError && onError();
     },
   });
   return query;
@@ -111,8 +124,9 @@ export function useAddAdmin(onSuccess?: () => void, onError?: () => void) {
       });
       onSuccess && onSuccess();
     },
-    onError: async (err: Error) => {
-      toast.error(err.message);
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });
@@ -133,8 +147,9 @@ export function useDeleteAdmin(onSuccess?: () => void, onError?: () => void) {
       });
       onSuccess && onSuccess();
     },
-    onError: async (err: Error) => {
-      toast.error(err.message);
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data?.message || "There was an error");
+      checkErrorStatus(err);
       onError && onError();
     },
   });

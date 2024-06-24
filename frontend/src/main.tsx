@@ -13,7 +13,7 @@ import { HelmetProvider } from "react-helmet-async";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retryDelay: 30000,
+      retryDelay: 1500,
       staleTime: 30 * 60 * 1000,
       cacheTime: 60 * 60 * 1000,
     },
