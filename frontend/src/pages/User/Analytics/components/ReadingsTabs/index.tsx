@@ -4,19 +4,20 @@ import TemperatueTab from "./TemperatueTab";
 import HumidityTab from "./HumidityTab";
 import GasTab from "./GasTab";
 import VibrationTab from "./VibrationTab";
+import { MonthlyStatics, useGetUserAnalytics } from "@api/analytics";
 
 const tabs = ["temperature", "humidity", "gas", "vibration"];
-const tabsComponents = {
-  temperature: <TemperatueTab />,
-  humidity: <HumidityTab />,
-  gas: <GasTab />,
-  vibration: <VibrationTab />,
-};
+const getTab = (data?: MonthlyStatics) => ({
+  temperature: <TemperatueTab data={data} />,
+  humidity: <HumidityTab data={data} />,
+  gas: <GasTab data={data} />,
+  vibration: <VibrationTab data={data} />,
+});
 const ReadingTabs = () => {
   const [currentTab, setCurrentTab] = useState<
     "temperature" | "humidity" | "gas" | "vibration"
   >("temperature");
-
+  const { data, isLoading, isError } = useGetUserAnalytics(currentTab);
   return (
     <>
       <Tabs
@@ -34,7 +35,7 @@ const ReadingTabs = () => {
           />
         ))}
       </Tabs>
-      {tabsComponents[currentTab]}
+      {isLoading ? "" : isError ? "" : getTab(data)[currentTab]}
     </>
   );
 };

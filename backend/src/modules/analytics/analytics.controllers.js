@@ -1,7 +1,8 @@
 const DailyStatics = require("../../../models/dailyStatics");
 const User = require("../../../models/users");
+const { asyncHandler } = require("../../middlewares/asyncHandler");
 
-const getAnalytics = async (req, res) => {
+const getAnalytics = asyncHandler(async (req, res) => {
   const d = new Date();
   d.setMonth(d.getMonth() - 1);
   d.setHours(0, 0, 0);
@@ -18,38 +19,38 @@ const getAnalytics = async (req, res) => {
     }
   ).populate("temperature.alerts humidity.alerts gas.alerts vibration.alerts");
   if (sensor === "temperature") {
-    res.status(200).send({
+    return res.status(200).send({
       monthlyStatics: dailyStatics.map((ele) => ({
         date: ele.createdAt,
         series: ele.temperature,
       })),
     });
   } else if (sensor === "humidity") {
-    res.status(200).send({
+    return res.status(200).send({
       monthlyStatics: dailyStatics.map((ele) => ({
         date: ele.createdAt,
         series: ele.humidity,
       })),
     });
   } else if (sensor === "gas") {
-    res.status(200).send({
-      gasLeaks: dailyStatics.map((ele) => ({
+    return res.status(200).send({
+      monthlyStatics: dailyStatics.map((ele) => ({
         date: ele.createdAt,
         alerts: ele.gas.alerts,
       })),
     });
   } else if (sensor === "vibration") {
-    res.status(200).send({
-      vibrations: dailyStatics.map((ele) => ({
+    return res.status(200).send({
+      monthlyStatics: dailyStatics.map((ele) => ({
         date: ele.createdAt,
         alerts: ele.vibration.alerts,
       })),
     });
   } else {
-    res.status(404).send({
+    return res.status(404).send({
       message: "Enter valid query parameter",
     });
   }
-};
+});
 
 exports.getAnalytics = getAnalytics;
