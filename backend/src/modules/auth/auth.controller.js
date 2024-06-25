@@ -72,7 +72,10 @@ const editUser = asyncHandler(async (req, res, next) => {
       throw new CustomError("There is another user with this userName");
   }
   //find and update user
-  await currentUser.updateOne({ ...req.body, password: hashedPass });
+  await currentUser.updateOne({
+    ...req.body,
+    ...(password && { password: hashedPass }),
+  });
   return res.status(200).send({ message: "updated successfully" });
 });
 
